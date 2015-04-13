@@ -1,4 +1,6 @@
-# p3-dashboard
+P3 Dashboard
+===============
+
 Fusepool P3 dashboard running in Jetty.
 
 ###Install and run
