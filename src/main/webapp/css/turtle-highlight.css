@@ -1,0 +1,26 @@
+
+.sunlight-container { margin: 0px !important; }
+
+.sunlight-code-container > .sunlight-highlighted {
+	white-space: pre-wrap;
+	max-height: 265px;
+	overflow: auto !important;
+	padding: 10px;
+}
+
+.sunlight-code-container {
+	border: none !important;
+	overflow: hidden !important;
+}
+
+/* ********** custom highlight types ********** */
+
+.sunlight-datatype {
+	color: #E700CF !important;
+	font-size: 11px !important;
+	font-style: italic !important;
+}
+
+.sunlight-longstring {
+	color: #DC0755 !important;
+}

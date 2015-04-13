@@ -1,0 +1,178 @@
+							
+<script id="UIRTemplate" type="text/x-handlebars-template">
+	<!-- User interaction requests -->
+	<div id="{{id}}" class="box box-solid bg-maroon-gradient">
+		<div class="box-header">
+			<i class="fa fa-hand-o-right"></i>
+			<h3 class="box-title">{{title}}</h3>
+			<!-- tools box -->
+			<div class="pull-right box-tools">
+				<button class="btn bg-maroon btn-sm" title="Refresh" onclick="refreshInteractionChildListById('{{id}}')"><i class="fa fa-refresh"></i></button>
+				<button class="btn bg-maroon btn-sm" title="Delete" data-widget="remove" onclick="deleteWidget('{{id}}')"><i class="fa fa-trash"></i></button>
+				<button class="btn bg-maroon btn-sm" title="Collapse" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				<button class="btn bg-maroon btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button>
+			</div><!-- /. tools -->
+		</div><!-- /.box-header -->
+		<div class="box-body">
+			<div class="form-group no-margin-bottom">
+				<select id="interactionList" class="form-control w-select-list" size="6">
+					<!-- interactions -->
+					{{#each children}}
+						<option value="{{this.uri.value}}" title="{{this.child.value}}">{{{this.comment.value}}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="form-group no-margin-bottom">
+				<div class="btn-group">
+					<button class="btn bg-maroon" onclick="openInteraction()">
+						<i class="fa fa-share"></i>
+						Open
+					</button>
+					<button class="btn bg-maroon" onclick="deleteInteraction('{{id}}')">
+						<i class="fa fa-trash"></i>
+						Delete
+					</button>
+				</div>
+			</div>
+		</div><!-- /.box-body -->
+	</div><!-- /.box -->
+</script>
+
+<script id="SPARQLTemplate" type="text/x-handlebars-template">
+<!-- SPARQL builder -->
+	<div id="{{id}}" class="box box-solid bg-aqua-gradient">
+		<div class="box-header">
+			<i class="fa fa-magic"></i>
+			<h3 class="box-title">{{title}}</h3>
+			<div class="box-tools pull-right">
+				<button class="btn bg-aqua btn-sm" title="Delete" data-widget="remove" onclick="deleteWidget('{{id}}')"><i class="fa fa-trash"></i></button>
+				<button class="btn bg-aqua btn-sm" title="Collapse" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				<button class="btn bg-aqua btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button>
+			</div>
+		</div>
+		<div class="box-body border-radius-none">
+			<div class="form-group no-margin-bottom">
+				<!-- textarea id="sparqlTextarea{{id}}" class="form-control" rows="3" placeholder="Type some SPARQL queries here..."></textarea -->
+				<div id="sparqlBuilder{{id}}"></div>
+			</div>
+			<div class="form-group no-margin-bottom">
+				<small>Press ctrl+Enter to send query</small>
+			</div>
+			<!-- div class="form-group no-margin-bottom">
+				<button class="btn btn-default" onclick="sendSPARQL()">Send it</button>
+			</div -->
+		</div><!-- /.box-body -->
+	</div><!-- /.box -->	
+	<!-- MODAL FOR SPARQL RESULT -->
+	<div class="modal fade sparqlModal" id="sparqlModal{{id}}" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">SPARQL result</h4>
+				</div>					
+				<div class="modal-main">
+					<div class="modal-body">
+						<div id="sparqlResult{{id}}"></div> 
+					</div>
+					<div class="modal-footer clearfix">
+						<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</script>
+	
+<script id="TLDPCTemplate" type="text/x-handlebars-template">
+	<!-- T-LDPC -->
+	<div id="{{id}}" class="box box-solid bg-blue-gradient">
+		<div class="box-header move-cursor">
+			<i class="fa fa-inbox"></i>
+			<h3 class="box-title">{{title}}</h3>
+			<!-- tools box -->
+			<div class="pull-right box-tools">
+			<div class="box-tools pull-right">
+				<button class="btn bg-blue btn-sm" title="Refresh" onclick="refreshTLDPCChildListById('{{id}}')"><i class="fa fa-refresh"></i></button>
+				<button class="btn bg-blue btn-sm" title="Settings" onclick="TLDPCSettings('{{id}}')"><i class="fa fa-gear"></i></button>
+				<button class="btn bg-blue btn-sm" title="Delete" data-widget="remove" onclick="deleteWidget('{{id}}')"><i class="fa fa-trash"></i></button>
+				<button class="btn bg-blue btn-sm" title="Collapse" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				<button class="btn bg-blue btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button>
+			</div>
+			</div><!-- /. tools -->
+		</div>
+		<div class="box-body">
+			<div class="form-group no-margin-bottom">
+				<select id="select{{id}}" class="form-control w-select-list" size="6">
+					<!-- children -->
+					{{#each children}}
+						<option title="{{this}}" value="{{this}}">{{{fileName this}}}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="form-group">
+				<div class="btn-group">
+					<button class="btn bg-blue" onclick="viewSelectedResource('{{id}}')">
+						<i class="fa fa-share"></i>
+						View
+					</button>
+					<button class="btn bg-blue" onclick="deleteSelectedResource('{{id}}')">
+						<i class="fa fa-trash"></i>
+						Delete
+					</button>
+				</div>
+			</div>
+			<div class="form-group no-margin-bottom">
+				<div class="nav-tabs-custom nav-tabs-green no-margin-bottom">
+					<ul class="nav nav-tabs nav-tabs-sm pull-right">
+						<li class="pull-left header">
+							<i class="fa fa-files-o"></i>
+							Add files
+						</li>
+						<li><a href="#externalTab{{id}}" data-toggle="tab">External source</a></li>
+						<li class="active"><a href="#uploadTab{{id}}" data-toggle="tab">Upload</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="uploadTab{{id}}">
+							<div id="droparea{{id}}" action="/file-upload" class="dropzone"></div>
+						</div><!-- /.tab-pane -->
+						<div class="tab-pane" id="externalTab{{id}}">
+							<div class="form-group no-margin-bottom">
+								<div class="input-group">
+									<input class="form-control" placeholder="http://">
+									<div class="input-group-btn">
+										<button class="btn btn-success">
+											<i class="fa fa-arrow-circle-left"></i> Populate
+										</button>
+									</div>
+								</div>
+							</div>
+						</div><!-- /.tab-pane -->
+					</div><!-- /.tab-content -->
+				</div><!-- nav-tabs-custom -->
+			</div>			
+		</div>
+	</div>
+</script>
+
+<script id="HOWTOTemplate" type="text/x-handlebars-template">
+	<!-- How to use the dashboard box -->
+	<div id="{{id}}" class="box box-info">
+		<div class="box-header">
+			<!-- tools box -->
+			<div class="pull-right box-tools">
+				<button class="btn btn-default btn-sm" title="Delete" data-widget="remove" onclick="deleteWidget('{{id}}')"><i class="fa fa-trash"></i></button>
+				<button class="btn btn-default btn-sm" title="Collapse" data-widget="collapse" data-toggle="tooltip"><i class="fa fa-minus"></i></button>
+				<button class="btn btn-default btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button>
+			</div><!-- /. tools -->
+
+			<i class="fa fa-info"></i>
+			<h3 class="box-title">{{title}}</h3>
+		</div>
+		<div class="box-body">
+			<div id="howToPanel" class="justify">
+				{{{description}}}
+			</div>
+		</div>
+	</div><!-- /.box -->
+</script>

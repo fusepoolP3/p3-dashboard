@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="bg-grey">
+    <head>
+        <meta charset="UTF-8">
+        <title>Transformers | P3 Dashboard</title>
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+       		
+		<!-- JS -->
+			<!-- jQuery -->
+			<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+			<script type="text/javascript" src="js/plugins/cookie/jquery.cookie.js"></script>
+			<!-- Bootstrap -->
+			<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+			<!-- jQuery UI -->
+			<script type="text/javascript" src="//code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+			<!-- Uduvudu -->
+			<script type="text/javascript" src="js/plugins/uduvudu/lib/underscore-1.6.0.js"></script>
+			<script type="text/javascript" src="js/plugins/uduvudu/lib/handlebars-v1.3.0.js"></script>
+			<script type="text/javascript" src="js/plugins/uduvudu/lib/rdf_store.js"></script>
+			<script type="text/javascript" src="js/plugins/uduvudu/matcher.js"></script>
+			<script type="text/javascript" src="js/plugins/uduvudu/src/uduvudu.js"></script>
+		<!-- /JS -->
+		
+		<!-- CSS -->
+			<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+			<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+			<!-- Theme style -->
+			<link href="css/AdminLTE.css" rel="stylesheet" type="text/css" />
+			<!-- Custom style -->
+			<link href="css/custom.css" rel="stylesheet" type="text/css" />
+		<!-- /CSS -->
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body class="skin-black bg-grey">
+		<!-- LOADING -->
+		<div id="loadingCover">&nbsp;</div>
+	
+        <!-- header logo: style can be found in header.less -->
+        <header id="siteHeader" class="header">
+            <a href="index.html" class="logo">
+                <img src="img/small-logo.png" title="Fusepool P3 Dashboard" alt="Fusepool P3 Dashboard" />
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-right">
+                    <ul class="nav navbar-nav">
+                    </ul>
+                </div>
+            </nav>
+        </header>
+		
+        <div class="wrapper row-offcanvas row-offcanvas-left bg-grey">
+			
+            <!-- Menu column. contains the logo and sidebar -->
+            <aside id="menuPanel" class="left-side sidebar-offcanvas">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="index.html" id="publishingMenuItem">
+                                <i class="fa fa-dashboard"></i> <span>Publishing</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="transformers.html" id="transformersMenuItem">
+                                <i class="fa fa-rocket"></i> <span>Transformers</span> <small id="transformerCountMenu" class="badge pull-right bg-green">0</small>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="configuration.html" id="configurationMenuItem">
+                                <i class="fa fa-wrench"></i> <span>Configuration</span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+
+            <!-- Main panel. Contains the navbar and content of the page -->
+            <aside id="mainPanel" class="right-side bg-grey">
+			
+                <!-- Content Header (Page header) -->
+                <section id="mainHeader" class="content-header"></section>
+				
+                <!-- Main content -->
+                <section id="mainContent" class="content bg-grey no-padding-top">
+				
+                    <!-- Main row -->
+                    <div id="firstMainRow" class="row">
+					
+                        <!-- ------------------------------------------- List of available transformers ------------------------------------------- -->
+                        <section class="col-lg-7">
+                            <!-- List of available transformers -->
+                            <div id="availableTransformersWidget" class="box box-solid bg-green-gradient">
+                                <div class="box-header">
+                                    <i class="fa fa-rocket"></i>
+                                    <h3 class="box-title">Transformers <small class="badge" id="transformerCount">0</small></h3>
+                                </div><!-- /.box-header -->
+                                <div class="box-body">
+									<div class="form-group">
+										Here is a list of the available transformers taken from your transformer registry. You can delete each registration, rename transformers and test them.
+									</div>
+									<div class="form-group">
+										<select id="transformerList" class="form-control w-select-list" size="16">
+											<!-- Transformers -->
+										</select>
+									</div>
+									<div class="form-group no-margin-bottom">
+										<div class="btn-group">
+											<button class="btn btn-default" onclick="renameTransformer()">
+												<i class="fa fa-pencil"></i>
+												Rename
+											</button>
+											<button class="btn btn-default" onclick="testTransformer()">
+												<i class="fa fa-share"></i>
+												Test
+											</button>
+											<button class="btn btn-default" onclick="deleteTransformer()">
+												<i class="fa fa-trash"></i>
+												Delete
+											</button>
+										</div>
+									</div>
+                                </div><!-- /.box-body -->
+                            </div><!-- /.box -->							
+                        </section>
+						
+                        <!-- ------------------------------------------- Create & Add transformers ------------------------------------------- -->
+                        <section class="col-lg-5">
+
+                            <!-- Register -->
+                            <div id="addNewTransformerWidget" class="box box-success">
+                                <div class="box-header">
+                                    <i class="fa fa-plus"></i>
+                                    <h3 class="box-title">Register</h3>
+                                </div><!-- /.box-header -->
+                                <div class="box-body">
+									<div class="form-group">
+										You can register external transformers by entering a URL.
+									</div>
+									<div class="form-group">
+										<input id="registerTitle" class="form-control" placeholder="Title">
+									</div>
+									<div class="form-group">
+										<textarea id="registerDescription" class="form-control" style="height: 34px;" placeholder="Description" rows="1"></textarea>
+									</div>
+									<div class="form-group no-margin-bottom">
+										<div class="input-group">
+											<input id="registerUri" class="form-control" placeholder="http://">
+											<div class="input-group-btn">
+												<button class="btn btn-success" onclick="registerTransformer()">
+													<i class="fa fa-arrow-circle-left"></i> Register
+												</button>
+											</div>
+										</div>
+									</div>
+                                </div><!-- /.box-body -->
+                            </div><!-- /.box -->
+							
+                            <!-- Create new -->
+                            <div id="addNewTransformerWidget" class="box box-success">
+                                <div class="box-header">
+                                    <i class="fa fa-pencil-square-o"></i>
+                                    <h3 class="box-title">Factories <small class="badge" id="factoryCount">0</small></h3>
+                                </div><!-- /.box-header -->
+                                <div class="box-body">
+									<div class="form-group">
+										You can create new transformers by using one of the transformer factories listed below. You can configure your new transformer on a new tab.
+									</div>
+									<div class="form-group">
+										<select id="factoryList" class="form-control w-select-list" size="8">
+											<!-- Factories -->
+										</select>
+									</div>
+									<div class="form-group no-margin-bottom">
+										<button class="btn btn-default" onclick="openFactoryGui()">
+											<i class="fa fa-external-link"></i>
+											Open factory GUI
+										</button>
+									</div>
+                                </div><!-- /.box-body -->
+                            </div><!-- /.box -->
+							
+                        </section>
+						
+                    </div><!-- /.row (main row) -->
+
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+        </div><!-- ./wrapper -->
+		
+		<!-- MODAL -->
+		<div class="modal fade" id="modalBox" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 id="modalTitle" class="modal-title">Modal box</h4>
+					</div>
+					<div class="modal-main">
+						<div id="modalBody" class="modal-body">
+						</div>
+						<div id="modalFooter" class="modal-footer clearfix">
+							<button id="modalCancelButton" type="button" class="btn btn-danger pull-left" data-dismiss="modal">Cancel</button>
+							<button id="modalOKButton" type="submit" class="btn btn-primary">OK</button>
+						</div>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+	
+		<!-- handlebar templates -->
+		<div id="templates"></div>
+		
+        <!-- iCheck -->
+        <script src="js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+
+        <!-- AdminLTE App -->
+        <script src="js/AdminLTE/app.js" type="text/javascript"></script>
+		
+		<!-- Custom JS -->
+		<script src="js/config.js" type="text/javascript"></script>
+		<script src="js/utils.js" type="text/javascript"></script>
+		<script src="js/transformers.js" type="text/javascript"></script>
+
+    </body>
+</html>
