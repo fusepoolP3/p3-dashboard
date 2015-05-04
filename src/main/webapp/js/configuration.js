@@ -135,7 +135,6 @@ function saveConfig() {
 	configItem.title = $('#configTitle').val();
 	configItem.description = $('#configDescription').val();
 	configItem.sparqlEndpoint = $('#configSparqlEndpoint').val();
-	configItem.wrldpc = $('#configWrldpc').val();
 	configItem.irldpc = $('#configIrldpc').val();
 	configItem.trldpc = $('#configTrldpc').val();
 	configItem.tfrldpc = $('#configTfrldpc').val();
@@ -143,7 +142,6 @@ function saveConfig() {
 	var valid = (!isEmpty(configItem.title) &
 				!isEmpty(configItem.description) & 
 				!isEmpty(configItem.sparqlEndpoint) & 
-				!isEmpty(configItem.wrldpc) & 
 				!isEmpty(configItem.irldpc) & 
 				!isEmpty(configItem.trldpc) & 
 				!isEmpty(configItem.tfrldpc) );
@@ -212,7 +210,6 @@ function saveConfig() {
 							$('#configDescription').val('');
 							$('#configSparqlEndpoint').val('');
 							$('#configIrldpc').val('');
-							$('#configWrldpc').val('');
 							$('#configTrldpc').val('');
 							$('#configTfrldpc').val('');
 						
@@ -235,14 +232,14 @@ function createConfigRegStr(configItem) {
 	var str = '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
 			+ '@prefix dcterms: <http://purl.org/dc/terms/> .  '
 			+ '@prefix crldpc: <http://vocab.fusepool.info/crldpc#> . '
-			+ '<> a crldpc:ConfigurationRegistration; '
-			+ '	dcterms:title "' + configItem.title + '"@en; '
-			+ '	dcterms:description "' + configItem.description + '"; '
-			+ '	crldpc:sparql-endpoint <' + configItem.sparqlEndpoint + '>; '
-			+ '	crldpc:ir-ldpc <' + configItem.irldpc + '>; '
-			+ '	crldpc:wr-ldpc <' + configItem.wrldpc + '>; '
-			+ '	crldpc:tfr-ldpc <' + configItem.tfrldpc + '>; '
-			+ '	crldpc:tr-ldpc <' + configItem.trldpc + '> .';
+			+ '<> a crldpc:ConfigurationRegistration ; '
+			+ '	dcterms:title "' + configItem.title + '"@en ; '
+			+ '	dcterms:description "' + configItem.description + '" ; '
+			+ '	crldpc:sparql-endpoint <' + configItem.sparqlEndpoint + '> ; '
+			+ '	crldpc:ir-ldpc <' + configItem.irldpc + '> ; '
+			+ '	crldpc:tfr-ldpc <' + configItem.tfrldpc + '> ; '
+			+ '	crldpc:tr-ldpc <' + configItem.trldpc + '> ; '
+			+ '	crldpc:wr-ldpc <> . ';
 
 	return str;
 }
@@ -255,7 +252,6 @@ function fillPropertyList(configItem) {
 	$('#selConfigTitle').text(configItem.title);
 	$('#selConfigDescription').text(configItem.description);
 	$('#selConfigSparqlEndpoint').text(configItem.sparqlEndpoint);
-	$('#selConfigWrldpc').text(configItem.wrldpc);
 	$('#selConfigIrldpc').text(configItem.irldpc);
 	$('#selConfigTrldpc').text(configItem.trldpc);
 	$('#selConfigTfrldpc').text(configItem.tfrldpc);
