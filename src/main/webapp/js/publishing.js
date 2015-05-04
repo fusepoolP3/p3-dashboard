@@ -6,21 +6,9 @@ refreshController.minSecs = 5;
 refreshController.defSecs = 60;
 
 $(document).ready(function () {
-	 "use strict";
-	 showLoadingCover();
-	 
-	// Getting tha dashboard config registry URI
-	// Continue only if it is provided
-	if(!extractConfigRegistryURI()) {		
-		var configRegistryURI = prompt('Please enter a valid configuration registry URI', 'http://sandbox.fusepool.info:8181/ldp/cr-ldpc');
-		if (configRegistryURI != null) {
-			setConfigRegistryURI(configRegistryURI);
-		}
-		else {
-			return;
-		}
-	}
-	registerConfigData(initDashboard);
+	"use strict";
+	showLoadingCover();
+	extractConfigRegistryURI(initDashboard);
 });
 
 /*********************/

@@ -2,19 +2,46 @@
 /**		Config	 	**/
 /*********************/
 
-function extractConfigRegistryURI() {
-	var set = getURLParameter("configRegistry");
-	if(set.length > 0) {
-		window.configRegistry = set[0];
+function extractConfigRegistryURI(initFunc) {
+	
+	// intend to extract the "platformURI" query param first
+	var set = getURLParameter("platformURI");
+	if(set.length > 0) {		
+		var ajaxRequest = jQuery.ajax({	type: "GET",
+									url: set[0],
+									async: false });	
 		
-		$('#publishingMenuItem').prop('href','index.html?configRegistry=' + configRegistry);
-		$('#transformersMenuItem').prop('href','transformers.html?configRegistry=' + configRegistry);
-		$('#configurationMenuItem').prop('href','configuration.html?configRegistry=' + configRegistry);
-		
-		return true;
+		ajaxRequest.done(function(response, textStatus, responseObj) {
+			var store = rdfstore.create();
+			store.load('text/turtle', response, function(success, results) {
+				if(success) {
+					store.execute("SELECT * { ?s <http://vocab.fusepool.info/fp3#dashboardConfigRegistry> ?o }", function(success, results) {
+						if(success) {
+							if(results.length > 0) {
+								setConfigRegistryURI(results[0].o.value);
+								registerConfigData(initFunc);
+							}
+						}
+					});
+				}
+			});
+		});
 	}
 	else {
-		return false;
+		// if we didn't find the platformURI or a proper configRegistry in it,
+		// try to use the the "configRegistry" query param instead
+		set = getURLParameter("configRegistry");
+		if(set.length > 0) {
+			setConfigRegistryURI(set[0]);
+			registerConfigData(initFunc);
+		}
+		else {			
+			var configRegistryURI = prompt('Please enter a valid configuration registry URI', 'http://sandbox.fusepool.info:8181/ldp/cr-ldpc');
+			if (configRegistryURI != null) {
+				setConfigRegistryURI(configRegistryURI);
+				registerConfigData(initFunc);
+			}
+		}
 	}
 }
 
@@ -53,7 +80,7 @@ function registerConfigData(initFunc){
 							var configUri = "";
 							//if there is only one config, use that one
 							if(results.length == 1) {
-								var configUri = results[0].o.value;
+								configUri = results[0].o.value;
 								$.cookie(configRegistry, configUri, { expires: 30, path: '/' });
 							}
 							else {
@@ -62,7 +89,7 @@ function registerConfigData(initFunc){
 									var foundOne = false;
 									for(var i=0; i<results.length; i++) {
 										if(results[i].o.value == $.cookie(configRegistry)) {
-											var configUri = results[i].o.value;
+											configUri = results[i].o.value;
 											foundOne = true;
 											break;
 										}
