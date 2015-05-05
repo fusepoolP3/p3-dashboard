@@ -1,1 +1,11 @@
 language: java
+before_install: mvn install -DskipTests=true -DfinalName=dashboard-$TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: A5EtwwQxJTvVb92oTbquc5JgJe3DRBXyAdjwUiuiFXMwMQWBvmbPxF0g9ccvgyDXsP8KBa3QUgOfJCc2At36Eo2jjyvL2kUQcm6kX21j2AKII/UbpEZtHlCRDloW3XL04dTuC3ItJO+5ZffRZELd3FK7OCY8bQt8LK7sTiBzEF0=
+  file: target/dashboard-$TRAVIS_TAG-jar-with-dependencies.jar
+  on:
+    repo: fusepoolP3/p3-dashboard
+    tags: true
+    all_branches: true
