@@ -165,14 +165,16 @@
 										</dd>
 										<dt>Description</dt>
 										<dd id="selConfigDescription"></dd>
-										<dt>SPARQL Endpoint</dt>
+										<dt title="SPARQL Endpoint">SPARQL Endpoint</dt>
 										<dd id="selConfigSparqlEndpoint"></dd>
-										<dt>IR-LDPC</dt>
+										<dt title="User Interaction Registry">IR-LDPC</dt>
 										<dd id="selConfigIrldpc"></dd>
-										<dt>TR-LDPC</dt>
+										<dt title="Transformer Registry">TR-LDPC</dt>
 										<dd id="selConfigTrldpc"></dd>
-										<dt>TFR-LDPC</dt>
+										<dt title="Transformer Factory Registry">TFR-LDPC</dt>
 										<dd id="selConfigTfrldpc"></dd>
+										<dt title="Widget Registry">WR-LDPC</dt>
+										<dd id="selConfigWrldpc"></dd>
 									</dl>
                                 </div><!-- /.box-body -->
                             </div><!-- /.box -->							
@@ -201,34 +203,6 @@
 							<div class="form-group">
 								<label for="configDescription">Description</label>
 								<textarea id="configDescription" class="form-control" style="height: 34px;" placeholder="Description" rows="1"></textarea>
-							</div>
-							<div class="form-group">
-								<label for="configSparqlEndpoint">SPARQL Endpoint</label> 
-								<button type="button" class="btn btn-sm btn-info btn-popover" tabindex="-1" title="SPARQL Endpoint" data-trigger="focus" data-toggle="popover" data-placement="right" data-content="A URI that is functioning as a SPARQL Endpoint to your platform. You can find more info <a href='http://semanticweb.org/wiki/SPARQL_endpoint' target='_blank'>here</a>.">
-									<i class="fa fa-info"></i>
-								</button>
-								<input id="configSparqlEndpoint" class="form-control" type="text" placeholder="http://" />
-							</div>
-							<div class="form-group">
-								<label for="configIrldpc">IR-LDPC</label>
-								<button type="button" class="btn btn-sm btn-info btn-popover" tabindex="-1" title="User interaction Request Registry" data-trigger="focus" data-toggle="popover" data-placement="right" data-content="The URI of an LDPC which User Interaction Requests are registered into by the Transformers.">
-									<i class="fa fa-info"></i>
-								</button>
-								<input id="configIrldpc" class="form-control" type="text" placeholder="http://" />
-							</div>
-							<div class="form-group">
-								<label for="configTrldpc">TR-LDPC</label>
-								<button type="button" class="btn btn-sm btn-info btn-popover" tabindex="-1" title="Transformer Registry" data-trigger="focus" data-toggle="popover" data-placement="right" data-content="The URI of an LDPC that contains your Transformers.">
-									<i class="fa fa-info"></i>
-								</button>
-								<input id="configTrldpc" class="form-control" type="text" placeholder="http://" />
-							</div>
-							<div class="form-group">
-								<label for="configTfrldpc">TFR-LDPC</label>
-								<button type="button" class="btn btn-sm btn-info btn-popover" tabindex="-1" title="Transformer Factory Registry" data-trigger="focus" data-toggle="popover" data-placement="right" data-content="The URI of an LDPC that contains your Transformer Factories.">
-									<i class="fa fa-info"></i>
-								</button>
-								<input id="configTfrldpc" class="form-control" type="text" placeholder="http://" />
 							</div>
 						</div>
 						<div id="modalFooter" class="modal-footer clearfix">

@@ -72,10 +72,10 @@ function useConfig() {
 	config.title = configItem.title;
 	config.description = configItem.description;
 	config.sparqlEndpoint = configItem.sparqlEndpoint;
-	config.wrldpc = configItem.wrldpc;
 	config.irldpc = configItem.irldpc;
 	config.trldpc = configItem.trldpc;
 	config.tfrldpc = configItem.tfrldpc;
+	config.wrldpc = configItem.wrldpc;
 	
 	$.cookie(configRegistry, config.uri, { expires: 30, path: '/' });
 	
@@ -122,20 +122,16 @@ function saveConfig() {
 	var configItem = {};
 	configItem.title = $('#configTitle').val();
 	configItem.description = $('#configDescription').val();
-	configItem.sparqlEndpoint = $('#configSparqlEndpoint').val();
-	configItem.irldpc = $('#configIrldpc').val();
-	configItem.trldpc = $('#configTrldpc').val();
-	configItem.tfrldpc = $('#configTfrldpc').val();
+	configItem.sparqlEndpoint = config.sparqlEndpoint;
+	configItem.irldpc = config.irldpc;
+	configItem.trldpc = config.trldpc;
+	configItem.tfrldpc = config.tfrldpc;
+	configItem.wrldpc = config.wrldpc;
 	
-	var valid = (!isEmpty(configItem.title) &
-				!isEmpty(configItem.description) & 
-				!isEmpty(configItem.sparqlEndpoint) & 
-				!isEmpty(configItem.irldpc) & 
-				!isEmpty(configItem.trldpc) & 
-				!isEmpty(configItem.tfrldpc) );
+	var valid = (!isEmpty(configItem.title) & !isEmpty(configItem.description) );
 	
 	if(!valid) {
-		alert('Please fill every fields!');
+		alert('Please fill both fields!');
 	}
 	else {
 		var data = createConfigRegStr(configItem);
@@ -179,11 +175,11 @@ function saveConfig() {
 								configItem.uri = res[0].s.value;
 								configItem.title = res[0].title.value;
 								configItem.description = res[0].description.value;
+								configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
 								configItem.irldpc = res[0].irldpc.value;
-								configItem.wrldpc = res[0].wrldpc.value;
 								configItem.tfrldpc = res[0].tfrldpc.value;
 								configItem.trldpc = res[0].trldpc.value;
-								configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
+								configItem.wrldpc = res[0].wrldpc.value;
 							}
 							
 							configs.push(configItem);
@@ -196,10 +192,6 @@ function saveConfig() {
 							
 							$('#configTitle').val('');
 							$('#configDescription').val('');
-							$('#configSparqlEndpoint').val('');
-							$('#configIrldpc').val('');
-							$('#configTrldpc').val('');
-							$('#configTfrldpc').val('');
 						
 							$('#newConfigPanel').modal('hide');
 						});
@@ -243,6 +235,7 @@ function fillPropertyList(configItem) {
 	$('#selConfigIrldpc').text(configItem.irldpc);
 	$('#selConfigTrldpc').text(configItem.trldpc);
 	$('#selConfigTfrldpc').text(configItem.tfrldpc);
+	$('#selConfigWrldpc').text(configItem.wrldpc);
 	
 	if(configItem.uri == config.uri) {
 		$('#inUseBadge').show();
@@ -299,10 +292,10 @@ function getConfigInfo(callbackFunction) {
 													configItem.title = res[0].title.value;
 													configItem.description = res[0].description.value;
 													configItem.irldpc = res[0].irldpc.value;
-													configItem.wrldpc = res[0].wrldpc.value;
+													configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
 													configItem.tfrldpc = res[0].tfrldpc.value;
 													configItem.trldpc = res[0].trldpc.value;
-													configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
+													configItem.wrldpc = res[0].wrldpc.value;
 												}
 												configs.push(configItem);
 												count++;

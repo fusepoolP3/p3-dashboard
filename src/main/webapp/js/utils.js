@@ -3,54 +3,47 @@
 /*********************/
 
 function extractConfigRegistryURI(initFunc) {
-	
-	// intend to extract the "platformURI" query param first
+		
 	var set = getURLParameter("platformURI");
-	if(set.length > 0) {		
-		var ajaxRequest = jQuery.ajax({	type: "GET",
-									url: set[0],
+	if(set.length > 0) {
+		platformURI = set[0];
+	}
+	else {		
+		var inputValue = prompt('Please enter a valid platform URI', 'http://sandbox.fusepool.info:8181/ldp/platform');
+		if (inputValue != null) {
+			platformURI = inputValue;
+		}
+		else {
+			return;
+		}
+	}
+	
+	var ajaxRequest = jQuery.ajax({	type: "GET",
+									url: platformURI,
 									async: false });	
 		
-		ajaxRequest.done(function(response, textStatus, responseObj) {
-			var store = rdfstore.create();
-			store.load('text/turtle', response, function(success, results) {
-				if(success) {
-					store.execute("SELECT * { ?s <http://vocab.fusepool.info/fp3#dashboardConfigRegistry> ?o }", function(success, results) {
-						if(success) {
-							if(results.length > 0) {
-								setConfigRegistryURI(results[0].o.value);
-								registerConfigData(initFunc);
-							}
+	ajaxRequest.done(function(response, textStatus, responseObj) {
+		var store = rdfstore.create();
+		store.load('text/turtle', response, function(success, results) {
+			if(success) {
+				store.execute("SELECT * { ?s <http://vocab.fusepool.info/fp3#dashboardConfigRegistry> ?o }", function(success, results) {
+					if(success) {
+						if(results.length > 0) {
+							window.configRegistry = results[0].o.value;
+							completeMenuLinks();
+							registerConfigData(initFunc);
 						}
-					});
-				}
-			});
-		});
-	}
-	else {
-		// if we didn't find the platformURI or a proper configRegistry in it,
-		// try to use the the "configRegistry" query param instead
-		set = getURLParameter("configRegistry");
-		if(set.length > 0) {
-			setConfigRegistryURI(set[0]);
-			registerConfigData(initFunc);
-		}
-		else {			
-			var configRegistryURI = prompt('Please enter a valid configuration registry URI', 'http://sandbox.fusepool.info:8181/ldp/cr-ldpc');
-			if (configRegistryURI != null) {
-				setConfigRegistryURI(configRegistryURI);
-				registerConfigData(initFunc);
+					}
+				});
 			}
-		}
-	}
+		});
+	});
 }
 
-function setConfigRegistryURI(configRegistryURI) {
-	window.configRegistry = configRegistryURI;
-		
-	$('#publishingMenuItem').prop('href','index.html?configRegistry=' + configRegistry);
-	$('#transformersMenuItem').prop('href','transformers.html?configRegistry=' + configRegistry);
-	$('#configurationMenuItem').prop('href','configuration.html?configRegistry=' + configRegistry);
+function completeMenuLinks() {		
+	$('#publishingMenuItem').prop('href','index.html?platformURI=' + platformURI);
+	$('#transformersMenuItem').prop('href','transformers.html?platformURI=' + platformURI);
+	$('#configurationMenuItem').prop('href','configuration.html?platformURI=' + platformURI);
 }
 
 function registerConfigData(initFunc){
@@ -134,11 +127,11 @@ function registerConfigData(initFunc){
 												config.uri = res[0].s.value;
 												config.title = res[0].title.value;
 												config.description = res[0].description.value;
+												config.sparqlEndpoint = res[0].sparqlEndpoint.value;
 												config.irldpc = res[0].irldpc.value;
-												config.wrldpc = res[0].wrldpc.value;
 												config.tfrldpc = res[0].tfrldpc.value;
 												config.trldpc = res[0].trldpc.value;
-												config.sparqlEndpoint = res[0].sparqlEndpoint.value;
+												config.wrldpc = res[0].wrldpc.value;
 											}
 											initFunc();
 										});
