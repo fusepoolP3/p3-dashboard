@@ -215,7 +215,7 @@ function getFactories(){
 }
 
 function openFactoryGui(){
-	openInNewTab(selectedFactory.uri.value);
+	openInNewTab(selectedFactory.uri.value + "&platformURI=" + platformURI);
 }
 
 function getFactoryByContainer(str) {
@@ -227,7 +227,7 @@ function getFactoryByContainer(str) {
     return null;
 }
 
-$("#factoryList" ).change(function() {
+$("#factoryList").change(function() {
 	var val = $(this).find("option:selected").val();
 	selectedFactory = getFactoryByContainer(val);
 });
