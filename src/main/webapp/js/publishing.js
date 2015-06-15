@@ -198,7 +198,7 @@ function addWidget(){
 	var transformerURI = $("#transformerURI").val();
 	var description = $("#widgetDescription").val();
 	
-	if(isEmpty(title)){
+	if(widgetType != "UIR" && isEmpty(title)){
 		alert('Please provide a widget title');
 	}
 	else if(widgetType == "T-LDPC" && isEmpty(transformerURI)){
@@ -263,6 +263,10 @@ function createWidgetRegStr(widgetType, title, description, transformerUri) {
 		descriptionRow = '  dcterms:description "' + escStr(description) + '"; ';
 	}
 	
+	if(widgetType == "UIR") {
+		title = "UIR";
+	}
+	
 	//TODO orderIndex, visible
 	var str = '@prefix dcterms: <http://purl.org/dc/terms/> . '
 			+ '@prefix wrldpc: <http://vocab.fusepool.info/wrldpc#> . '
@@ -282,6 +286,7 @@ function widgetTypeChange() {
 	
 	$('#transformerList').parent().slideUp();
 	$('#transformerURI').parent().slideUp();
+	$('#widgetTitle').parent().slideDown();
 	$('#widgetDescription').prop('placeholder', 'Description (optional)');
 	
 	switch($("#widgetType").val()){
@@ -289,7 +294,7 @@ function widgetTypeChange() {
 			
 		break;
 		case "UIR":
-		
+			$('#widgetTitle').parent().slideUp();
 		break;
 		case "HOWTO":
 			$('#widgetDescription').prop('placeholder', 'Description');
