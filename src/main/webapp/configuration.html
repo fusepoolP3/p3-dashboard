@@ -97,7 +97,7 @@
                     <!-- Main Buttons -->
                     <div class="row">
                         <section class="col-lg-12" >
-							<a class="btn btn-app no-margin" data-toggle="modal" data-target="#newConfigPanel">
+							<a class="btn btn-app no-margin" onclick="onNewConfigClick()">
 								<i class="fa fa-plus"></i>
 								New configuration
 							</a>
@@ -134,11 +134,11 @@
 												<i class="fa fa-check-circle"></i>
 												Use it now
 											</button>
-											<button class="btn btn-default" onclick="modifyConfig()">
+											<button class="btn btn-default" onclick="onModifyConfigClick()">
 												<i class="fa fa-pencil"></i>
 												Modify
 											</button>
-											<button class="btn btn-default" onclick="deleteConfig()">
+											<button class="btn btn-default" onclick="onDeleteConfigClick()">
 												<i class="fa fa-trash"></i>
 												Delete
 											</button>

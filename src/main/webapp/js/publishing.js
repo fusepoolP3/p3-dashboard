@@ -310,6 +310,7 @@ function deleteWidget(widgetId) {
 	if( confirm('Are you sure you want to delete this widget?') ) {
 		var widgetItem = getWidgetById(widgetId);
 		deleteResource(widgetItem.uri);
+		$('#'+widgetId).slideUp(400, function() { $(this).remove(); });
 	}
 }
 
@@ -439,7 +440,7 @@ function refreshTLDPCChildListById(widgetId){
 }
 
 function refreshTLDPCChildList(widget) {
-	showWidgetLoader(widget.id);
+	// showWidgetLoader(widget.id);
 	
 	var query = 'SELECT * WHERE { ' 
 	  + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> <' + widget.uri + '> . '
@@ -469,12 +470,12 @@ function refreshTLDPCChildList(widget) {
 			widget.children.push(child);
 			$('#select' + widget.id).append($('<option>').val(child).prop('title',child).text(getFileName(child)));
 		}
-		hideWidgetLoader(widget.id);
+		// hideWidgetLoader(widget.id);
 	
 	});
 	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
 		alert('Refreshing the widget was unsuccessful.');
-		hideWidgetLoader(widget.id);
+		// hideWidgetLoader(widget.id);
         console.error(xhr, textStatus, errorThrown);
     });
 }
@@ -498,9 +499,9 @@ function deleteSelectedResource(widgetId) {
 	}
 	else {
 		if( confirm('Are you sure you want to delete the selected resource?') ) {
-			showWidgetLoader(widgetId);
+			// showWidgetLoader(widgetId);
 			var callbackFunction = function() {
-				hideWidgetLoader(widgetId);
+				// hideWidgetLoader(widgetId);
 				refreshTLDPCChildListById(widgetId);
 			};
 			deleteResource(resourceURI, callbackFunction);
@@ -551,7 +552,7 @@ function viewResource(resourceURI) {
 
 function uploadFile(file, widget) {
 	if(!$.isEmptyObject(file)){
-		showWidgetLoader(widget.id);
+		// showWidgetLoader(widget.id);
 		
 		var ajaxRequest = $.ajax({	type: "POST",
 									url: widget.uri,
@@ -562,11 +563,11 @@ function uploadFile(file, widget) {
 								});	
 		
 		ajaxRequest.done(function(response, textStatus, request){
-			hideWidgetLoader(widget.id);
+			// hideWidgetLoader(widget.id);
 			refreshTLDPCChildList(widget);
 		});
 		ajaxRequest.fail(function(response, textStatus, statusLabel){
-			hideWidgetLoader(widget.id);
+			// hideWidgetLoader(widget.id);
 			alert('Uploading was unsuccessful. Maybe try again later. (You can also check the console for details.)');
 			console.error(response, textStatus, statusLabel);
 		});
@@ -677,7 +678,7 @@ function deleteInteraction(widgetId) {
 	}
 	else {
 		if (confirm('Are you sure you want to delete "' + selectedInteraction.comment.value + '"?')) {
-			showWidgetLoader(widgetId);
+			// showWidgetLoader(widgetId);
 			var ajaxRequest = $.ajax({
 				type: 'DELETE',
 				url: selectedInteraction.child.value,
@@ -685,12 +686,12 @@ function deleteInteraction(widgetId) {
 			
 			ajaxRequest.done(function (response) {
 				// check for HTTP_OK or HTTP_NO_CONTENT
-				hideWidgetLoader(widgetId);
+				// hideWidgetLoader(widgetId);
 				refreshInteractionChildListById(widgetId);
 			});
 			
 			ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
-				hideWidgetLoader(widgetId);
+				// hideWidgetLoader(widgetId);
 				alert('Deleting the resource failed.');
 				console.error(xhr, textStatus, errorThrown);
 			});
@@ -724,7 +725,7 @@ function refreshInteractionChildListById(widgetId) {
 }
 
 function refreshInteractionChildList(widget) {
-	showWidgetLoader(widget.id);
+	// showWidgetLoader(widget.id);
 	
 	interactions = [];
 	$('#interactionList').empty();
@@ -758,12 +759,12 @@ function refreshInteractionChildList(widget) {
 			$('#interactionList').append($('<option>').val(child.uri.value).prop('title',child.child.value).text(getFileName(child.comment.value)));
 			interactions.push(child);
 		}
-		hideWidgetLoader(widget.id);
+		// hideWidgetLoader(widget.id);
 	
 	});
 	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
 		alert('Refreshing the widget was unsuccessful.');
-		hideWidgetLoader(widget.id);
+		// hideWidgetLoader(widget.id);
         console.error(xhr, textStatus, errorThrown);
     });
 }

@@ -1,4 +1,5 @@
 var configs = [];
+var currentAction = "NEW";
 
 $(document).ready(function () {
 	"use strict";
@@ -22,6 +23,7 @@ function initDashboard() {
 	}
 	if(newConfig) {
 		$('#newConfigPanel').modal('show');
+		$('#modalTitle').text('New configuration');
 	}
 	else {
 		fillPropertyList(config);
@@ -76,17 +78,34 @@ function useConfig() {
 	config.trldpc = configItem.trldpc;
 	config.tfrldpc = configItem.tfrldpc;
 	config.wrldpc = configItem.wrldpc;
+	config.ETag = configItem.ETag;
 	
 	$.cookie(configRegistry, config.uri, { expires: 30, path: '/' });
 	
 	$('#inUseBadge').show();
 }
 
-function modifyConfig() {
-	alert('Not implemented yet.');
+function onNewConfigClick() {
+	currentAction = "NEW";
+	$('#modalTitle').text('New configuration');
+	$('#configTitle').val('');
+	$('#configDescription').val('');
+	$('#newConfigPanel').modal('show');
 }
 
-function deleteConfig() {
+function onModifyConfigClick() {
+	alert('Not iplemented.'); return;
+	
+	var configItem = getSelectedConfigItem();
+	
+	currentAction = "MODIFY";
+	$('#modalTitle').text('Modify configuration');
+	$('#configTitle').val(configItem.title);
+	$('#configDescription').val(configItem.description);
+	$('#newConfigPanel').modal('show');
+}
+
+function onDeleteConfigClick() {
 	var configItem = getSelectedConfigItem();
 	if(configItem.uri == config.uri) {
 		alert('You cannot delete a configuration that is currently in use.');
@@ -127,84 +146,128 @@ function saveConfig() {
 	configItem.trldpc = config.trldpc;
 	configItem.tfrldpc = config.tfrldpc;
 	configItem.wrldpc = config.wrldpc;
+	configItem.ETag = 0;
 	
 	var valid = (!isEmpty(configItem.title) & !isEmpty(configItem.description) );
 	
 	if(!valid) {
 		alert('Please fill both fields!');
 	}
-	else {
-		var data = createConfigRegStr(configItem);
-		
-		var ajaxRequest = $.ajax({
-			type: 'POST',
-			headers: { 
-				'Content-Type': 'text/turtle',
-				'Slug' : configItem.title
-			},
-			url: configRegistry,
-			data: data
-		});
-		
-		ajaxRequest.done(function (response, textStatus, request) {
-			
-			var configUri = request.getResponseHeader('Location');
-			
-			var request = $.ajax({	type: "GET",
-									url: configUri,
-									cache: false	});
-														
-			request.done(function(response, textStatus, request) {
-				var configStore = rdfstore.create();
-				configStore.load('text/turtle', response, function(success, res) {
-					if(success) {
-						var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
-									"PREFIX crldpc: <http://vocab.fusepool.info/crldpc#> " +
-									"SELECT * { " +
-									" ?s dcterms:title ?title . " +
-									" ?s dcterms:description ?description . " +
-									" ?s crldpc:sparql-endpoint ?sparqlEndpoint . " +
-									" ?s crldpc:ir-ldpc ?irldpc . " +
-									" ?s crldpc:tr-ldpc ?trldpc . " +
-									" ?s crldpc:tfr-ldpc ?tfrldpc . " +
-									" ?s crldpc:wr-ldpc ?wrldpc . " +
-									" }";
-						
-						configStore.execute(query, function(success, res) {
-							if(success) {
-								configItem.uri = res[0].s.value;
-								configItem.title = res[0].title.value;
-								configItem.description = res[0].description.value;
-								configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
-								configItem.irldpc = res[0].irldpc.value;
-								configItem.tfrldpc = res[0].tfrldpc.value;
-								configItem.trldpc = res[0].trldpc.value;
-								configItem.wrldpc = res[0].wrldpc.value;
-							}
-							
-							configs.push(configItem);
-							if(configs.length == 1) {
-								config = configItem;
-							}
-							
-							fillConfigList();
-							fillPropertyList();
-							
-							$('#configTitle').val('');
-							$('#configDescription').val('');
-						
-							$('#newConfigPanel').modal('hide');
-						});
-					}
-				});
-			});
-			request.fail(function(response, textStatus, statusLabel){});
-		});
-		ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
-			console.error(xhr, textStatus, errorThrown);
-			$('#newConfigPanel').modal('hide');
-		});		
+	else {		
+		if(currentAction == "NEW") {
+			saveNewConfig(configItem);
+		}
+		else {
+			modifyConfig(configItem);
+		}
 	}
+}
+
+function modifyConfig(configItem) {
+	
+	var data = createConfigRegStr(configItem);
+		
+	var ajaxRequest = $.ajax({
+		type: 'PUT',
+		headers: {
+			'Content-Type': 'text/turtle',
+			'If-Match': configItem.ETag
+		},
+		url: configItem.uri,
+		data: data
+	});
+
+	ajaxRequest.done(function (response, textStatus, request) {
+		fillConfigList();
+		fillPropertyList();
+		
+		$('#configTitle').val('');
+		$('#configDescription').val('');	
+		$('#newConfigPanel').modal('hide');
+	});
+	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+		$('#configTitle').val('');
+		$('#configDescription').val('');	
+		$('#newConfigPanel').modal('hide');
+	});		
+}
+
+function saveNewConfig(configItem) {
+	
+	var data = createConfigRegStr(configItem);
+	
+	var ajaxRequest = $.ajax({
+		type: 'POST',
+		headers: { 
+			'Content-Type': 'text/turtle',
+			'Slug' : configItem.title
+		},
+		url: configRegistry,
+		data: data
+	});
+		
+	ajaxRequest.done(function (response, textStatus, request) {
+		
+		var configUri = request.getResponseHeader('Location');
+		
+		var request = $.ajax({	type: "GET",
+								url: configUri,
+								cache: false	});
+													
+		request.done(function(response, textStatus, request) {
+			var configStore = rdfstore.create();
+			configStore.load('text/turtle', response, function(success, res) {
+				if(success) {
+					var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
+								"PREFIX crldpc: <http://vocab.fusepool.info/crldpc#> " +
+								"SELECT * { " +
+								" ?s dcterms:title ?title . " +
+								" ?s dcterms:description ?description . " +
+								" ?s crldpc:sparql-endpoint ?sparqlEndpoint . " +
+								" ?s crldpc:ir-ldpc ?irldpc . " +
+								" ?s crldpc:tr-ldpc ?trldpc . " +
+								" ?s crldpc:tfr-ldpc ?tfrldpc . " +
+								" ?s crldpc:wr-ldpc ?wrldpc . " +
+								" }";
+					
+					configStore.execute(query, function(success, res) {
+						if(success) {
+							configItem.uri = res[0].s.value;
+							configItem.title = res[0].title.value;
+							configItem.description = res[0].description.value;
+							configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
+							configItem.irldpc = res[0].irldpc.value;
+							configItem.tfrldpc = res[0].tfrldpc.value;
+							configItem.trldpc = res[0].trldpc.value;
+							configItem.wrldpc = res[0].wrldpc.value;
+							configItem.ETag = request.getResponseHeader('ETag');
+						}
+						
+						configs.push(configItem);
+						if(configs.length == 1) {
+							config = configItem;
+						}
+						
+						fillConfigList();
+						fillPropertyList();
+						
+						$('#configTitle').val('');
+						$('#configDescription').val('');
+					
+						$('#newConfigPanel').modal('hide');
+					});
+				}
+			});
+		});
+		request.fail(function(response, textStatus, statusLabel){});
+	});
+	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+		$('#configTitle').val('');
+		$('#configDescription').val('');
+		$('#newConfigPanel').modal('hide');
+	});		
 }
 
 function createConfigRegStr(configItem) {
@@ -270,6 +333,8 @@ function getConfigInfo(callbackFunction) {
 														cache: false	});
 															
 								request.done(function(response, textStatus, request) {
+									var ETag = request.getResponseHeader('ETag');
+									console.log(configUri + " - " + ETag);
 									var configStore = rdfstore.create();
 									configStore.load('text/turtle', response, function(success, res) {
 										if(success) {
@@ -296,6 +361,7 @@ function getConfigInfo(callbackFunction) {
 													configItem.tfrldpc = res[0].tfrldpc.value;
 													configItem.trldpc = res[0].trldpc.value;
 													configItem.wrldpc = res[0].wrldpc.value;
+													configItem.ETag = ETag;
 												}
 												configs.push(configItem);
 												count++;
