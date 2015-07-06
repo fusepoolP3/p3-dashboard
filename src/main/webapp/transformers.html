@@ -124,7 +124,7 @@
 												<i class="fa fa-pencil"></i>
 												Rename
 											</button>
-											<button class="btn btn-default" onclick="testTransformer()">
+											<button class="btn btn-default" onclick="onTestClick()">
 												<i class="fa fa-share"></i>
 												Test
 											</button>
@@ -202,20 +202,43 @@
             </aside><!-- /.right-side -->
         </div><!-- ./wrapper -->
 		
-		<!-- MODAL -->
-		<div class="modal fade" id="modalBox" tabindex="-1" role="dialog" aria-hidden="true">
+		<!-- MODAL FOR NEW CONFIGURATION / MODIFICATION -->
+		<div class="modal fade" id="testPanel" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 id="modalTitle" class="modal-title">Modal box</h4>
-					</div>
+						<h4 id="modalTitle" class="modal-title">Test transformer <i>[<span id="testedTransformerName"></span>]</i></h4>
+					</div>					
 					<div class="modal-main">
-						<div id="modalBody" class="modal-body">
+						<div id="testModalBody" class="modal-body">
+							<div class="form-group">
+								<span class="form-group-btn">
+									<button id="browse" class="btn btn-default" title="Browse" type="button">
+										<span class="glyphicon glyphicon-paperclip"></span>
+										<span class="glyphicon-button disappearing">Browse</span>
+									</button>
+								</span>
+								<input id="filePath" class="form-control" type="text" readonly="" placeholder="Browse input file">
+							</div>
+							<div class="form-group">
+								<label for="acceptHeader">Accept Header</label>
+								<textarea id="acceptHeader" class="form-control" style="height: 34px;" placeholder="Accept Header (optional)" rows="1"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="contentType">Content-Type</label>
+								<textarea id="contentType" class="form-control" style="height: 34px;" placeholder="Content-Type (optional)" rows="1"></textarea>
+							</div>
+							<hr />
+							<div class="form-group">
+								<label for="resultBox">Result</label>
+								<div id="resultBox" class="well no-padding"></div>
+							</div>
+							<input id="file" style="width: 0px;display: none;" type="file" accept=".txt" />
 						</div>
 						<div id="modalFooter" class="modal-footer clearfix">
-							<button id="modalCancelButton" type="button" class="btn btn-danger pull-left" data-dismiss="modal">Cancel</button>
-							<button id="modalOKButton" type="submit" class="btn btn-primary">OK</button>
+							<button id="modalCancelButton" type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+							<button id="modalOKButton" type="button" onclick="testTransformer()" class="btn btn-success" >Test transformer</button>
 						</div>
 					</div>
 				</div><!-- /.modal-content -->

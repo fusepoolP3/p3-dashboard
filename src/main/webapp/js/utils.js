@@ -200,7 +200,11 @@ function hideWidgetLoader(widgetId) {
 }
 
 function escapeNoddedStr(str) {
-	return str.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); /*.replace(/\n/g,'<br>');*/
+	return (isEmpty(str) ? '' : str.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;')); /*.replace(/\n/g,'<br>');*/
+}
+
+function escapeHTML(html) {
+    return (isEmpty(html) ? '' : html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
 }
 
 /** Escaping tricky IDs for jQuery selectors 

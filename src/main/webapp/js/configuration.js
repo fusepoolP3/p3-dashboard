@@ -27,7 +27,7 @@ function initDashboard() {
 	}
 	else {
 		fillPropertyList(config);
-		getConfigInfo(fillConfigList);
+		getConfigInfo([fillConfigList]);
 	}
 	$('#configRegistryLabel').text(configRegistry);
 	$('[data-toggle="popover"]').popover({ html: true });
@@ -93,15 +93,15 @@ function onNewConfigClick() {
 	$('#newConfigPanel').modal('show');
 }
 
-function onModifyConfigClick() {
-	alert('Not iplemented.'); return;
-	
+function onModifyConfigClick() {	
 	var configItem = getSelectedConfigItem();
 	
 	currentAction = "MODIFY";
 	$('#modalTitle').text('Modify configuration');
 	$('#configTitle').val(configItem.title);
 	$('#configDescription').val(configItem.description);
+	$('#ETag').val(configItem.ETag);
+	$('#uri').val(configItem.uri);
 	$('#newConfigPanel').modal('show');
 }
 
@@ -141,12 +141,13 @@ function saveConfig() {
 	var configItem = {};
 	configItem.title = $('#configTitle').val();
 	configItem.description = $('#configDescription').val();
+	configItem.ETag = $('#ETag').val();
+	configItem.uri = $('#uri').val();
 	configItem.sparqlEndpoint = config.sparqlEndpoint;
 	configItem.irldpc = config.irldpc;
 	configItem.trldpc = config.trldpc;
 	configItem.tfrldpc = config.tfrldpc;
 	configItem.wrldpc = config.wrldpc;
-	configItem.ETag = 0;
 	
 	var valid = (!isEmpty(configItem.title) & !isEmpty(configItem.description) );
 	
@@ -178,8 +179,7 @@ function modifyConfig(configItem) {
 	});
 
 	ajaxRequest.done(function (response, textStatus, request) {
-		fillConfigList();
-		fillPropertyList();
+		getConfigInfo([fillConfigList, fillPropertyList]);
 		
 		$('#configTitle').val('');
 		$('#configDescription').val('');	
@@ -308,7 +308,7 @@ function fillPropertyList(configItem) {
 	}
 }
 
-function getConfigInfo(callbackFunction) {
+function getConfigInfo(callbackFunctions) {
 	
 	var ajaxRequest = $.ajax({	type: "GET",
 								async: false,
@@ -325,6 +325,7 @@ function getConfigInfo(callbackFunction) {
 							// TODO new config
 						}
 						else {
+							configs = [];
 							var count = 0;
 							for(var i=0; i<results.length; i++) {
 								var configUri = results[i].o.value;
@@ -334,7 +335,6 @@ function getConfigInfo(callbackFunction) {
 															
 								request.done(function(response, textStatus, request) {
 									var ETag = request.getResponseHeader('ETag');
-									console.log(configUri + " - " + ETag);
 									var configStore = rdfstore.create();
 									configStore.load('text/turtle', response, function(success, res) {
 										if(success) {
@@ -366,7 +366,9 @@ function getConfigInfo(callbackFunction) {
 												configs.push(configItem);
 												count++;
 												if(results.length == count) {
-													callbackFunction();
+													for(var j=0;j<callbackFunctions.length;j++) {
+														callbackFunctions[j]();
+													}
 												}
 											});
 										}

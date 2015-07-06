@@ -94,10 +94,10 @@
 			<div class="pull-right box-tools">
 			<div class="box-tools pull-right">
 				<button class="btn bg-blue btn-sm" title="Refresh" onclick="refreshTLDPCChildListById('{{id}}')"><i class="fa fa-refresh"></i></button>
-				<button class="btn bg-blue btn-sm" title="Settings" onclick="TLDPCSettings('{{id}}')"><i class="fa fa-gear"></i></button>
-				<button class="btn bg-blue btn-sm" title="Delete" onclick="deleteWidget('{{id}}')"><i class="fa fa-trash"></i></button>
+				<!-- button class="btn bg-blue btn-sm" title="Settings" onclick="TLDPCSettings('{{id}}')"><i class="fa fa-gear"></i></button -->
+				<!-- button class="btn bg-blue btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button -->
 				<button class="btn bg-blue btn-sm" title="Collapse" data-widget="collapse"><i class="fa fa-minus"></i></button>
-				<button class="btn bg-blue btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button>
+				<button class="btn bg-blue btn-sm" title="Delete" onclick="deleteWidget('{{id}}')"><i class="fa fa-times"></i></button>
 			</div>
 			</div><!-- /. tools -->
 		</div>
@@ -141,7 +141,7 @@
 								<div class="input-group">
 									<input class="form-control" placeholder="http://">
 									<div class="input-group-btn">
-										<button class="btn btn-success">
+										<button class="btn btn-success"  onclick="populateFile()"">
 											<i class="fa fa-arrow-circle-left"></i> Populate
 										</button>
 									</div>

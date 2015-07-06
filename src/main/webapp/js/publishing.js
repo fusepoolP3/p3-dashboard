@@ -554,11 +554,13 @@ function uploadFile(file, widget) {
 	if(!$.isEmptyObject(file)){
 		// showWidgetLoader(widget.id);
 		
+		var fileType = (file.type == "text/plain" ? "text/x-plain" : file.type );
+		
 		var ajaxRequest = $.ajax({	type: "POST",
 									url: widget.uri,
 									data: file,
 									headers: { "Slug" : file.name },
-									contentType: file.type,
+									contentType: fileType,
 									processData: false
 								});	
 		
@@ -582,6 +584,10 @@ function resetDropArea(widgetId) {
 
 function TLDPCSettings() {
 	alert('not yet implemented');
+}
+
+function populateFile() {
+	alert('Only file upload is available yet.');
 }
 
 /**************************************/

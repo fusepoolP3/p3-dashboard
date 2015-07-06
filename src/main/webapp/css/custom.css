@@ -154,6 +154,10 @@ body > .header .logo {
 	font-size: 13px;
 }
 
+#resultBox  > pre {
+	font-size: 11px;
+}
+
 .left-side {
 bottom: 0px;
 }

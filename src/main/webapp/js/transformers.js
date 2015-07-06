@@ -2,6 +2,7 @@ var transformers;
 var factories;
 var selectedTransformer;
 var selectedFactory;
+var selectedText; //test
 
 $(document).ready(function () {
 	"use strict";
@@ -12,7 +13,66 @@ $(document).ready(function () {
 function initDashboard(){
     getTransformers();
 	getFactories();
-	hideLoadingCover();
+	initFileInput();
+	hideLoadingCover();	
+}
+
+/* Testing */
+
+function initFileInput() {
+	$('#browse').click(function () {
+		$('#file').click();
+		return false;
+	});
+	
+	$('#filePath').click(function () {
+		$('#file').click();
+		return false;
+	});
+
+	$('#file').change(function (e) {
+		var filename = $('#file').val();
+		var res = filename.split("\\");
+		filename = res[res.length - 1];
+		$('#filePath').val(filename);
+		var file = e.target.files[0];
+		if (!isEmpty(file)) {
+			showLoadingCover();
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				selectedText = e.target.result;
+				hideLoadingCover();
+			};
+			reader.readAsText(file)
+		}
+		return false;
+	});
+}
+
+function testTransformer() {
+    showLoadingCover();
+
+    var acceptHeader = isEmpty(acceptHeader) ? '*/*' : $('#acceptHeader').val();
+    var contentType = isEmpty(contentType) ? 'text/plain; charset=utf-8' : $('#contentType').val();
+
+    $.ajax({
+        type: 'POST',
+        url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
+        headers: {
+            'Accept': acceptHeader,
+            'Content-Type': contentType
+        },
+        data: selectedText
+    })
+    .done(function (data) {
+        $('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
+        hideLoadingCover();
+    })
+    .fail(function (xhr, textStatus, errorThrown) {
+        hideLoadingCover();
+        $('#resultBox').html('');
+        console.error(xhr, textStatus, errorThrown);
+    });
 }
 
 /*************************/
@@ -82,10 +142,14 @@ function deleteTransformer(){
 	}
 }
 
+function onTestClick() {
+	$('#testPanel').modal();
+	$('#testedTransformerName').text(selectedTransformer.title.value);
+}
+
 function renameTransformer(){
-	alert('not yet implemented');
-	/*
-	var newName = prompt('New name', 'Transformer');
+	
+	var newName = prompt('New name', selectedTransformer.title.value);
 	if (newName != null) {
 		var ajaxRequest = $.ajax({
 			type: 'GET',
@@ -93,8 +157,14 @@ function renameTransformer(){
 		});
 		
 		ajaxRequest.done(function (response, textStatus, request) {
-			window.res = response;
-			window.r = request;
+			
+			var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
+				+ '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
+				+ '<> a trldpc:TransformerRegistration; '
+				+ 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
+				+ 'dcterms:title "' + newName + '"@en; '
+				+ 'dcterms:description "' + selectedTransformer.description.value + '". ';
+			
 			var ETag = request.getResponseHeader('ETag');
 			var putRequest = $.ajax({
 				type: 'PUT',
@@ -103,17 +173,19 @@ function renameTransformer(){
 					'Content-Type': 'text/turtle',
 					'If-Match': ETag
 				},
-				data: '<> <http://purl.org/dc/terms/title> "' + newName + '" . '
+				data: data
+			});			
+			putRequest.done(function (response, textStatus, request) {
+				$('#transformerList option[value="' + selectedTransformer.child.value + '"]').text(newName);
+			});			
+			putRequest.fail(function (xhr, textStatus, errorThrown) {
+				console.error(xhr, textStatus, errorThrown);
 			});
-		});		
+		});
 		ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
 			console.error(xhr, textStatus, errorThrown);
 		});
-	}*/
-}
-
-function testTransformer(){
-	alert('not yet implemented');
+	}
 }
 
 function registerTransformer(){
