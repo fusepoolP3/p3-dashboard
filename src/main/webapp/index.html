@@ -112,7 +112,7 @@
                     <!-- Main Buttons -->
                     <div class="row">
                         <section class="col-lg-12" >
-							<a class="btn btn-app no-margin" data-toggle="modal" data-target="#newWidgetPanel">
+							<a class="btn btn-app no-margin" onclick="onNewWidgetClick()"> 
 								<i class="fa fa-plus"></i>
 								New widget
 							</a>
@@ -196,10 +196,11 @@
 							<div class="form-group">
 								<textarea id="widgetDescription" class="form-control" style="height: 34px;" placeholder="Description (optional)" rows="1"></textarea>
 							</div>
+							<input id="widgetId" type="hidden" value="" />
 						</div>
 						<div id="modalFooter" class="modal-footer clearfix">
 							<button id="modalCancelButton" type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-							<button id="modalOKButton" type="button" onclick="addWidget()" class="btn btn-primary">Create widget</button>
+							<button id="modalOKButton" type="button" onclick="saveWidget()" class="btn btn-primary">Save widget</button>
 						</div>
 					</div>
 				</div><!-- /.modal-content -->

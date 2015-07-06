@@ -154,7 +154,7 @@ function saveConfig() {
 	if(!valid) {
 		alert('Please fill both fields!');
 	}
-	else {		
+	else {
 		if(currentAction == "NEW") {
 			saveNewConfig(configItem);
 		}
@@ -190,7 +190,7 @@ function modifyConfig(configItem) {
 		$('#configTitle').val('');
 		$('#configDescription').val('');	
 		$('#newConfigPanel').modal('hide');
-	});		
+	});
 }
 
 function saveNewConfig(configItem) {

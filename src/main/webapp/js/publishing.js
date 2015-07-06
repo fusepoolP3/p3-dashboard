@@ -4,6 +4,7 @@ var selectedInteraction;
 var refreshController = {};
 refreshController.minSecs = 5;
 refreshController.defSecs = 60;
+var currentAction = "NEW";
 
 $(document).ready(function () {
 	"use strict";
@@ -191,7 +192,57 @@ function isExistingWidget(WLDPCURI) {
 	return false;
 }
 
-function addWidget(){
+function onNewWidgetClick() {
+	currentAction = "NEW";
+	$('#newWidgetPanel').modal();
+	$('#modalTitle').text('New widget');
+	$('#widgetType').prop('disabled', false);
+	widgetTypeChange();
+}
+
+function saveNewWidget(data) {
+
+	var ajaxRequest = $.ajax({
+		type: 'POST',
+		headers: { 
+			'Content-Type': 'text/turtle',
+			'Slug' : title
+		},
+		url: config.wrldpc,
+		data: data
+	});
+	
+	ajaxRequest.done(function (response) {
+		$("#widgetTitle").val('');
+		$("#transformerURI").val('');
+		$("#widgetDescription").val('');
+		$("#transformerList").val($("#transformerList option:first").val());
+		
+		// refresh widget list to get the new widget
+		switch(widgetType) {
+			case "T-LDPC":
+				getTLDPCs();
+			break;
+			case "UIR":
+				getInteractions();
+			break;
+			case "HOWTO":
+				getHowtos();
+			break;
+			case "SPARQL":
+				getSparqlBuilders();
+			break;
+		}
+		$('#newWidgetPanel').modal('hide');
+		
+	});
+	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+		$('#newWidgetPanel').modal('hide');
+	});
+}
+
+function saveWidget(){
 	var widgetType = $("#widgetType").val();
 	
 	var title = $("#widgetTitle").val();
@@ -209,46 +260,37 @@ function addWidget(){
 	}
 	else {
 		var data = createWidgetRegStr(widgetType, title, description, transformerURI);
-
-		var ajaxRequest = $.ajax({
-			type: 'POST',
-			headers: { 
-				'Content-Type': 'text/turtle',
-				'Slug' : title
-			},
-			url: config.wrldpc,
-			data: data
-		});
-		
-		ajaxRequest.done(function (response) {
-			$("#widgetTitle").val('');
-			$("#transformerURI").val('');
-			$("#widgetDescription").val('');
-			$("#transformerList").val($("#transformerList option:first").val());
-			
-			// refresh widget list to get the new widget
-			switch(widgetType) {
-				case "T-LDPC":
-					getTLDPCs();
-				break;
-				case "UIR":
-					getInteractions();
-				break;
-				case "HOWTO":
-					getHowtos();
-				break;
-				case "SPARQL":
-					getSparqlBuilders();
-				break;
-			}
-			$('#newWidgetPanel').modal('hide');
-			
-		});
-		ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
-			console.error(xhr, textStatus, errorThrown);
-			$('#newWidgetPanel').modal('hide');
-		});
+		if(currentAction == "NEW") {
+			saveNewWidget(data);
+		}
+		else {
+			modifyTLDPCWidget(data);
+		}
 	}
+}
+
+function modifyTLDPCWidget(data) {
+	
+	var widget = getWidgetById($('#widgetId').val());
+	
+	var ajaxRequest = $.ajax({
+		type: 'PUT',
+		headers: {
+			'Content-Type': 'text/turtle',
+			'If-Match': widget.ETag
+		},
+		url: widget.uri,
+		data: data
+	});
+
+	ajaxRequest.done(function (response, textStatus, request) {
+		getTLDPCs();
+		$('#newWidgetPanel').modal('hide');
+	});
+	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+		$('#newWidgetPanel').modal('hide');
+	});		
 }
 
 function createWidgetRegStr(widgetType, title, description, transformerUri) {
@@ -499,9 +541,9 @@ function deleteSelectedResource(widgetId) {
 	}
 	else {
 		if( confirm('Are you sure you want to delete the selected resource?') ) {
-			// showWidgetLoader(widgetId);
+			showWidgetLoader(widgetId);
 			var callbackFunction = function() {
-				// hideWidgetLoader(widgetId);
+				hideWidgetLoader(widgetId);
 				refreshTLDPCChildListById(widgetId);
 			};
 			deleteResource(resourceURI, callbackFunction);
@@ -552,7 +594,7 @@ function viewResource(resourceURI) {
 
 function uploadFile(file, widget) {
 	if(!$.isEmptyObject(file)){
-		// showWidgetLoader(widget.id);
+		showWidgetLoader(widget.id);
 		
 		var fileType = (file.type == "text/plain" ? "text/x-plain" : file.type );
 		
@@ -565,11 +607,11 @@ function uploadFile(file, widget) {
 								});	
 		
 		ajaxRequest.done(function(response, textStatus, request){
-			// hideWidgetLoader(widget.id);
+			hideWidgetLoader(widget.id);
 			refreshTLDPCChildList(widget);
 		});
 		ajaxRequest.fail(function(response, textStatus, statusLabel){
-			// hideWidgetLoader(widget.id);
+			hideWidgetLoader(widget.id);
 			alert('Uploading was unsuccessful. Maybe try again later. (You can also check the console for details.)');
 			console.error(response, textStatus, statusLabel);
 		});
@@ -582,8 +624,19 @@ function resetDropArea(widgetId) {
 	$('#droparea' + widgetId).html('Drop files here / click to browse');
 }
 
-function TLDPCSettings() {
-	alert('not yet implemented');
+function TLDPCSettings(widgetId) {	
+	currentAction = "MODIFY";
+	var widget = getWidgetById(widgetId);
+	
+	$('#modalTitle').text('Widget settings');
+	$('#newWidgetPanel').modal();
+	
+	$('widgetId').val(widgetId);
+	$('#widgetType').val('T-LDPC').prop('disabled', 'disabled');
+	$('#widgetTitle').val(widget.title);
+	$('#transformerList').val(widget.widgetTransformer);
+	
+	widgetTypeChange();
 }
 
 function populateFile() {
@@ -684,7 +737,7 @@ function deleteInteraction(widgetId) {
 	}
 	else {
 		if (confirm('Are you sure you want to delete "' + selectedInteraction.comment.value + '"?')) {
-			// showWidgetLoader(widgetId);
+			showWidgetLoader(widgetId);
 			var ajaxRequest = $.ajax({
 				type: 'DELETE',
 				url: selectedInteraction.child.value,
@@ -692,12 +745,12 @@ function deleteInteraction(widgetId) {
 			
 			ajaxRequest.done(function (response) {
 				// check for HTTP_OK or HTTP_NO_CONTENT
-				// hideWidgetLoader(widgetId);
+				hideWidgetLoader(widgetId);
 				refreshInteractionChildListById(widgetId);
 			});
 			
 			ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
-				// hideWidgetLoader(widgetId);
+				hideWidgetLoader(widgetId);
 				alert('Deleting the resource failed.');
 				console.error(xhr, textStatus, errorThrown);
 			});
