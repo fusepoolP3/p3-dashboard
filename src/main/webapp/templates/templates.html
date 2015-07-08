@@ -139,9 +139,9 @@
 						<div class="tab-pane" id="externalTab{{id}}">
 							<div class="form-group no-margin-bottom">
 								<div class="input-group">
-									<input class="form-control" placeholder="http://">
+									<input id="externalURI{{id}}" class="form-control" placeholder="http://">
 									<div class="input-group-btn">
-										<button class="btn btn-success"  onclick="populateFile()"">
+										<button class="btn btn-success"  onclick="populateFile('{{id}}')">
 											<i class="fa fa-arrow-circle-left"></i> Populate
 										</button>
 									</div>
