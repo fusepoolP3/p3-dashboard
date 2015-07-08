@@ -200,7 +200,7 @@ function onNewWidgetClick() {
 	widgetTypeChange();
 }
 
-function saveNewWidget(data) {
+function saveNewWidget(title, widgetType, data) {
 
 	var ajaxRequest = $.ajax({
 		type: 'POST',
@@ -261,7 +261,7 @@ function saveWidget(){
 	else {
 		var data = createWidgetRegStr(widgetType, title, description, transformerURI);
 		if(currentAction == "NEW") {
-			saveNewWidget(data);
+			saveNewWidget(title, widgetType, data);
 		}
 		else {
 			modifyTLDPCWidget(data);
@@ -596,13 +596,11 @@ function uploadFile(file, widget) {
 	if(!$.isEmptyObject(file)){
 		showWidgetLoader(widget.id);
 		
-		var fileType = (file.type == "text/plain" ? "text/x-plain" : file.type );
-		
 		var ajaxRequest = $.ajax({	type: "POST",
 									url: widget.uri,
 									data: file,
 									headers: { "Slug" : file.name },
-									contentType: fileType,
+									contentType: file.type,
 									processData: false
 								});	
 		
