@@ -50,7 +50,15 @@ public class EndPoint {
             connection.setUseCaches(false);
             connection.setDoInput(true);
 
-            final String fileName = connection.getHeaderField("Content-Disposition");
+            String fileName = connection.getHeaderField("Content-Disposition");
+
+            if (!StringUtils.isEmpty(fileName) && fileName.contains("=")) {
+                fileName = fileName.split("=")[1];
+            } else {
+                fileName = url.getPath();
+                fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            }
+
             final MimeType mimeType = new MimeType(connection.getContentType());
             final byte[] content = IOUtils.toByteArray(connection.getInputStream());
 
@@ -59,9 +67,8 @@ public class EndPoint {
             connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("POST");
-            if (!StringUtils.isEmpty(fileName)) {
-                connection.setRequestProperty("Slug", fileName);
-            }
+
+            connection.setRequestProperty("Slug", fileName);
             connection.setRequestProperty("Content-Type", mimeType.toString());
             connection.setRequestProperty("Content-Length", Integer.toString(content.length));
 
