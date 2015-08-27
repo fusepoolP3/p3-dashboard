@@ -208,6 +208,7 @@ function saveNewWidget(title, widgetType, data) {
         type: 'POST',
         headers: {
             'Content-Type': 'text/turtle',
+						'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
             'Slug': title
         },
         url: config.wrldpc,
@@ -279,6 +280,7 @@ function modifyTLDPCWidget(data) {
         type: 'PUT',
         headers: {
             'Content-Type': 'text/turtle',
+						'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
             'If-Match': widget.ETag
         },
         url: widget.uri,
@@ -315,7 +317,8 @@ function createWidgetRegStr(widgetType, title, description, transformerUri) {
     var str = '@prefix dcterms: <http://purl.org/dc/terms/> . '
             + '@prefix wrldpc: <http://vocab.fusepool.info/wrldpc#> . '
             + '@prefix eldp: <http://vocab.fusepool.info/eldp#>. '
-            + '<> a wrldpc:WidgetRegistration; '
+            + '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+						+ ' <> a ldp:Container, ldp:BasicContainer, wrldpc:WidgetRegistration; '
             + '  wrldpc:type "' + widgetType + '"; '
             + '  wrldpc:orderIndex 0; '
             + '  wrldpc:visible "true"^^xsd:boolean; '
@@ -605,7 +608,7 @@ function uploadFile(file, widget) {
         var ajaxRequest = $.ajax({type: "POST",
             url: widget.uri,
             data: file,
-            headers: {"Slug": file.name},
+            headers: { "Slug": file.name },
             contentType: file.type,
             processData: false
         });

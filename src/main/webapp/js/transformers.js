@@ -64,15 +64,15 @@ function testTransformer() {
         },
         data: selectedText
     })
-            .done(function (data) {
-                $('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
-                hideLoadingCover();
-            })
-            .fail(function (xhr, textStatus, errorThrown) {
-                hideLoadingCover();
-                $('#resultBox').html('');
-                console.error(xhr, textStatus, errorThrown);
-            });
+		.done(function (data) {
+				$('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
+				hideLoadingCover();
+		})
+		.fail(function (xhr, textStatus, errorThrown) {
+				hideLoadingCover();
+				$('#resultBox').html('');
+				console.error(xhr, textStatus, errorThrown);
+		});
 }
 
 /*************************/
@@ -160,7 +160,8 @@ function renameTransformer() {
 
             var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
                     + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-                    + '<> a trldpc:TransformerRegistration; '
+										+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+										+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
                     + 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
                     + 'dcterms:title "' + newName + '"@en; '
                     + 'dcterms:description "' + selectedTransformer.description.value + '". ';
@@ -171,6 +172,7 @@ function renameTransformer() {
                 url: selectedTransformer.child.value,
                 headers: {
                     'Content-Type': 'text/turtle',
+										'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
                     'If-Match': ETag
                 },
                 data: data
@@ -202,7 +204,8 @@ function registerTransformer() {
     else {
         var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
                 + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-                + '<> a trldpc:TransformerRegistration; '
+								+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+								+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
                 + 'trldpc:transformer <' + uri + '>; '
                 + 'dcterms:title "' + title + '"@en; '
                 + 'dcterms:description "' + description + '". ';
@@ -210,7 +213,8 @@ function registerTransformer() {
         $.ajax({
             type: 'POST',
             headers: {
-                'Content-Type': 'text/turtle'
+                'Content-Type': 'text/turtle',
+								'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?'
             },
             url: config.trldpc,
             data: data

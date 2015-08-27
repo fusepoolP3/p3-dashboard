@@ -172,6 +172,7 @@ function modifyConfig(configItem) {
 		type: 'PUT',
 		headers: {
 			'Content-Type': 'text/turtle',
+			'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
 			'If-Match': configItem.ETag
 		},
 		url: configItem.uri,
@@ -201,6 +202,7 @@ function saveNewConfig(configItem) {
 		type: 'POST',
 		headers: { 
 			'Content-Type': 'text/turtle',
+			'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
 			'Slug' : configItem.title
 		},
 		url: configRegistry,
@@ -275,7 +277,7 @@ function createConfigRegStr(configItem) {
 	var str = '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
 			+ '@prefix dcterms: <http://purl.org/dc/terms/> .  '
 			+ '@prefix crldpc: <http://vocab.fusepool.info/crldpc#> . '
-			+ '<> a crldpc:ConfigurationRegistration ; '
+			+ '<> a ldp:Container, ldp:BasicContainer, crldpc:ConfigurationRegistration ; '
 			+ '	dcterms:title "' + configItem.title + '"@en ; '
 			+ '	dcterms:description "' + configItem.description + '" ; '
 			+ '	crldpc:sparql-endpoint <' + configItem.sparqlEndpoint + '> ; '
