@@ -52,13 +52,16 @@ function initFileInput() {
 function testTransformer() {
     showLoadingCover();
 
-    var acceptHeader = isEmpty(acceptHeader) ? '*/*' : $('#acceptHeader').val();
-    var contentType = isEmpty(contentType) ? 'text/plain; charset=utf-8' : $('#contentType').val();
+	var acceptHeaderInput = $('#acceptHeader').val();
+	var contentTypeInput = $('#contentType').val();
+	
+    var acceptHeader = isEmpty(acceptHeaderInput) ? '*/*' : acceptHeaderInput;
+    var contentType = isEmpty(contentTypeInput) ? 'text/plain; charset=utf-8' : contentTypeInput;
 
     $.ajax({
         type: 'POST',
         url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
-        headers: {
+		headers: {
             'Accept': acceptHeader,
             'Content-Type': contentType
         },
