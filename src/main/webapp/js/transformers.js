@@ -111,10 +111,10 @@ function getTransformers() {
                 if (first) {
                     first = false;
                     selectedTransformer = transformer;
-                    $("#transformerList").append($('<option>').text(transformer.title.value).val(transformer.child.value).prop('selected', 'selected'));
+                    $("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value).prop('selected', 'selected'));
                 }
                 else {
-                    $("#transformerList").append($('<option>').text(transformer.title.value).val(transformer.child.value));
+                    $("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value));
                 }
             });
         }
@@ -280,10 +280,10 @@ function getFactories() {
                 if (first) {
                     first = false;
                     selectedFactory = factory;
-                    $("#factoryList").append($('<option>').text(factory.title.value).val(factory.child.value).prop('selected', 'selected'));
+                    $("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value).prop('selected', 'selected'));
                 }
                 else {
-                    $("#factoryList").append($('<option>').text(factory.title.value).val(factory.child.value));
+                    $("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value));
                 }
             });
         }

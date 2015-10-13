@@ -157,6 +157,7 @@ function showWidget(parentId, widget) {
                 widget.uploads = new Dropzone('#' + widget.id, {
                     url: "/upload/url",
                     previewsContainer: '#droparea' + widget.id,
+										acceptedFiles: '*.*',
                     clickable: '#droparea' + widget.id
                 });
                 widget.uploads.options.autoProcessQueue = false;
@@ -183,6 +184,20 @@ function showWidget(parentId, widget) {
     else {
         //console.log('This widget is already in use ('+widget.id+')');
     }
+}
+
+function showTLDPCInfo(widgetId) {
+    var widget = getWidgetById(widgetId);
+    if (!isEmpty(widget)) {
+			//console.log(widget);
+			
+			$('#infoWidgetTitle').html(widget.title);
+			$('#infoTLDPCURI').html(widget.uri);
+			$('#infoTransformerURI').html(widget.widgetTransformer);
+			$('#infoDescription').html(widget.description);
+			
+			$('#widgetInfo').modal();
+		}
 }
 
 function isExistingWidget(WLDPCURI) {
@@ -462,8 +477,8 @@ function getTLDPCs() {
                             type: "T-LDPC",
                             orderIndex: tldpc.orderIndex.value,
                             visible: tldpc.visible.value,
-                            // date: tldpc.date.value, //optional...
-                            // description: tldpc.description.value, //optional...
+														date: (isEmpty(tldpc.date) ? "" : tldpc.date.value), 
+                            description: (isEmpty(tldpc.description) ? "" : tldpc.description.value), 
                             widgetTransformer: tldpc.widgetTransformer.value,
                             children: arr});
                     }
@@ -541,6 +556,17 @@ function viewSelectedResource(widgetId) {
     }
 }
 
+function getSelectedResourceURI(widgetId) {
+    var resourceURI = $('#select' + widgetId).val();
+
+    if ($.trim(resourceURI) == "") {
+        alert("Select a resource");
+    }
+    else {
+        getResourceURI(resourceURI);
+    }
+}
+
 function deleteSelectedResource(widgetId) {
     var resourceURI = $('#select' + widgetId).val();
 
@@ -557,6 +583,10 @@ function deleteSelectedResource(widgetId) {
             deleteResource(resourceURI, callbackFunction);
         }
     }
+}
+
+function getResourceURI(resourceURI) {
+	window.prompt("Copy to clipboard: Ctrl+C, Enter", resourceURI);
 }
 
 function viewResource(resourceURI) {

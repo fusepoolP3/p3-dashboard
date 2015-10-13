@@ -211,6 +211,48 @@
 		<div class="modal fade" id="TODO" tabindex="-1" role="dialog" aria-hidden="true">
 		</div><!-- /.modal -->
 		
+		<!-- MODAL FOR WIDGET INFO -->
+		<div class="modal fade" id="widgetInfo" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 id="detailsTitle" class="modal-title">Widget information</h4>
+					</div>					
+					<div class="modal-main">
+						<div id="previewBody" class="modal-body">
+							<div class="callout callout-info">
+								<p>T-LDPC widgets can be used to easily upload files to the platform that automatically go through a selected transformation. One T-LDPC widget is connected to one specific transformer. Here you can see the details:</p>
+							</div>
+							<table class="table table-bordered">
+								<tbody>
+									<tr>
+											<td><strong>Widget title</strong></td>
+											<td><span id="infoWidgetTitle"></span></td>
+									</tr>
+									<tr>
+											<td><strong>T-LDPC URI</strong></td>
+											<td><span id="infoTLDPCURI"></span></td>
+									</tr>
+									<tr>
+											<td><strong>Transformer URI</strong></td>
+											<td><span id="infoTransformerURI"></span></td>
+									</tr>
+									<tr>
+											<td><strong>Description</strong></td>
+											<td><span id="infoDescription"></span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div id="previewFooter" class="modal-footer clearfix">
+							<button id="previewCloseButton" type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		
 		<!-- MODAL FOR RESOURCE PREVIEW -->
 		<div class="modal fade" id="previewPanel" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-dialog">

@@ -93,6 +93,7 @@
 			<!-- tools box -->
 			<div class="pull-right box-tools">
 			<div class="box-tools pull-right">
+				<button class="btn bg-blue btn-sm" title="Details" data-widget="chat-pane-toggle" onclick="showTLDPCInfo('{{id}}')"><i class="fa fa-info"></i></button>
 				<button class="btn bg-blue btn-sm" title="Refresh" onclick="refreshTLDPCChildListById('{{id}}')"><i class="fa fa-refresh"></i></button>
 				<!-- button class="btn bg-blue btn-sm" title="Settings" onclick="TLDPCSettings('{{id}}')"><i class="fa fa-gear"></i></button -->
 				<!-- button class="btn bg-blue btn-sm" title="Hide" data-widget="remove"><i class="fa fa-times"></i></button -->
@@ -115,6 +116,10 @@
 					<button class="btn bg-blue" onclick="viewSelectedResource('{{id}}')">
 						<i class="fa fa-share"></i>
 						View
+					</button>
+					<button class="btn bg-blue" onclick="getSelectedResourceURI('{{id}}')">
+						<i class="fa fa-link"></i>
+						Get URI
 					</button>
 					<button class="btn bg-blue" onclick="deleteSelectedResource('{{id}}')">
 						<i class="fa fa-trash"></i>
@@ -150,7 +155,7 @@
 						</div><!-- /.tab-pane -->
 					</div><!-- /.tab-content -->
 				</div><!-- nav-tabs-custom -->
-			</div>			
+			</div>
 		</div>
 	</div>
 </script>
