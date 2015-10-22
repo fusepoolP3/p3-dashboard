@@ -89,6 +89,8 @@ function getTransformers() {
             + '?child <http://vocab.fusepool.info/trldpc#transformer> ?uri . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -98,9 +100,9 @@ function getTransformers() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     }).done(function (data) {
         $("#transformerList").empty();
         transformers = data.results.bindings;
@@ -160,11 +162,14 @@ function renameTransformer() {
         });
 
         ajaxRequest.done(function (response, textStatus, request) {
-
+            
+            // Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
+            // Re-enable following once supported.
+            /* As was:
             var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
                     + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-										+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-										+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
+                    + '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+                    + '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
                     + 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
                     + 'dcterms:title "' + newName + '"@en; '
                     + 'dcterms:description "' + selectedTransformer.description.value + '". ';
@@ -175,7 +180,7 @@ function renameTransformer() {
                 url: selectedTransformer.child.value,
                 headers: {
                     'Content-Type': 'text/turtle',
-										'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
+                    'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
                     'If-Match': ETag
                 },
                 data: data
@@ -186,6 +191,51 @@ function renameTransformer() {
             putRequest.fail(function (xhr, textStatus, errorThrown) {
                 console.error(xhr, textStatus, errorThrown);
             });
+            */
+           
+            // Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
+            // Implement update/overwrite as delete + create
+            var deleteRequest = $.ajax({
+                type: 'DELETE',
+                url: selectedTransformer.child.value,
+            });
+
+            deleteRequest.done(function (response) {
+                // check for HTTP_OK or HTTP_NO_CONTENT
+                var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
+                + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
+                + '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+                + '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
+                + 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
+                + 'dcterms:title "' + newName + '"@en; '
+                + 'dcterms:description "' + selectedTransformer.description.value + '". ';
+
+                var postRequest = $.ajax({
+                    type: 'POST',
+                    url: selectedTransformer.child.value,
+                    headers: {
+                        'Content-Type': 'text/turtle',
+                        'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
+                        'Slug': newName
+                    },
+                    data: data
+                });
+        
+                postRequest.done(function (response, textStatus, request) {
+                    selectedTransformer.title.value = newName;
+                    $('#transformerList option[value="' + selectedTransformer.child.value + '"]').text(newName);
+                });
+                    
+                postRequest.fail(function (xhr, textStatus, errorThrown) {
+                    console.error(xhr, textStatus, errorThrown);
+                });
+            });
+
+            deleteRequest.fail(function (xhr, textStatus, errorThrown) {
+                console.error(xhr, textStatus, errorThrown);
+            });
+            
+
         });
         ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
             console.error(xhr, textStatus, errorThrown);
@@ -207,8 +257,8 @@ function registerTransformer() {
     else {
         var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
                 + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-								+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-								+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
+		+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+		+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
                 + 'trldpc:transformer <' + uri + '>; '
                 + 'dcterms:title "' + title + '"@en; '
                 + 'dcterms:description "' + description + '". ';
@@ -217,7 +267,8 @@ function registerTransformer() {
             type: 'POST',
             headers: {
                 'Content-Type': 'text/turtle',
-								'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?'
+		'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
+                'Slug': title
             },
             url: config.trldpc,
             data: data
@@ -258,6 +309,8 @@ function getFactories() {
             + '?child <http://vocab.fusepool.info/tfrldpc#transformerFactory> ?uri . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -267,9 +320,9 @@ function getFactories() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     }).done(function (data) {
         $("#factoryList").empty();
         factories = data.results.bindings;

@@ -424,6 +424,8 @@ function getTLDPCs() {
             + '?child <http://vocab.fusepool.info/eldp#transformer> ?widgetTransformer . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -433,9 +435,9 @@ function getTLDPCs() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: {query: query}
     });
 
     ajaxRequest.done(function (data) {
@@ -455,9 +457,9 @@ function getTLDPCs() {
                 url: config.sparqlEndpoint,
                 headers: {
                     'Accept': 'application/sparql-results+json',
-                    'Content-Type': 'application/sparql-query;charset=UTF-8'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                data: query
+                data: { query: query }
             });
 
             ajaxRequest.done(function (data) {
@@ -520,9 +522,9 @@ function refreshTLDPCChildList(widget) {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
@@ -717,6 +719,8 @@ function getInteractions() {
             + '?child <http://vocab.fusepool.info/wrldpc#visible> ?visible . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -726,9 +730,9 @@ function getInteractions() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
@@ -741,6 +745,8 @@ function getInteractions() {
                     + '?child <http://vocab.fusepool.info/fp3#interactionResource> ?uri . '
                     + 'OPTIONAL { '
                     + '	?child <http://www.w3.org/2000/01/rdf-schema#comment> ?comment . '
+                    + '}'
+                    + 'OPTIONAL { '
                     + '	?child <http://purl.org/dc/terms/created> ?date . '
                     + '}'
                     + '}';
@@ -750,9 +756,9 @@ function getInteractions() {
                 url: config.sparqlEndpoint,
                 headers: {
                     'Accept': 'application/sparql-results+json',
-                    'Content-Type': 'application/sparql-query;charset=UTF-8'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                data: query
+                data: { query: query }
             });
 
             ajaxRequest.done(function (data) {
@@ -852,6 +858,8 @@ function refreshInteractionChildList(widget) {
             + '?child <http://vocab.fusepool.info/fp3#interactionResource> ?uri . '
             + 'OPTIONAL { '
             + '	?child <http://www.w3.org/2000/01/rdf-schema#comment> ?comment . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -861,9 +869,9 @@ function refreshInteractionChildList(widget) {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
@@ -903,6 +911,8 @@ function getSparqlBuilders() {
             + '?child <http://vocab.fusepool.info/wrldpc#visible> ?visible . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -912,9 +922,9 @@ function getSparqlBuilders() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
@@ -955,9 +965,9 @@ function sendSPARQL() {
             url: config.sparqlEndpoint,
             headers: {
                 'Accept': 'application/sparql-results+json',
-                'Content-Type': 'application/sparql-query;charset=UTF-8'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            data: query
+            data: { query: query }
         }).done(function (data) {
             console.log(data);
             alert('for now you can see response in console');
@@ -993,9 +1003,9 @@ function getHowtos() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
@@ -1036,6 +1046,8 @@ function getTransformers() {
             + '?child <http://vocab.fusepool.info/trldpc#transformer> ?uri . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
+            + '}'
+            + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
             + '}'
             + '}';
@@ -1045,9 +1057,9 @@ function getTransformers() {
         url: config.sparqlEndpoint,
         headers: {
             'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/sparql-query;charset=UTF-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: query
+        data: { query: query }
     });
 
     ajaxRequest.done(function (data) {
