@@ -27,11 +27,29 @@ function extractConfigRegistryURI(initFunc) {
     ajaxRequest.done(function (response, textStatus, responseObj) {
         var store = rdfstore.create();
         store.load('text/turtle', response, function (success, results) {
-            if (success) {
-                store.execute("SELECT * { ?s <http://vocab.fusepool.info/fp3#dashboardConfigRegistry> ?o }", function (success, results) {
+            if (success) {							
+							var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
+											"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+											"PREFIX fp3: <http://vocab.fusepool.info/fp3#> " +
+											"SELECT * { " +
+											" ?s fp3:dashboardConfigRegistry ?dashboardConfigRegistry " +
+											" OPTIONAL { ?s fp3:sparqlEndpoint ?sparqlEndpoint } " +
+											" OPTIONAL { ?s fp3:userInteractionRequestRegistry ?userInteractionRequestRegistry } " +
+											" OPTIONAL { ?s fp3:transformerFactoryRegistry ?transformerFactoryRegistry } " +
+											" OPTIONAL { ?s fp3:transformerRegistry ?transformerRegistry } " +
+											"}";
+											
+                store.execute(query, function (success, res) {
                     if (success) {
-                        if (results.length > 0) {
-                            window.configRegistry = results[0].o.value;
+                        if (res.length > 0) {
+                            window.configRegistry = res[0].dashboardConfigRegistry.value;
+														
+														// platform defaults
+														config.sparqlEndpoint = (isEmpty(res[0].sparqlEndpoint) ? "" : res[0].sparqlEndpoint.value);
+														config.irldpc = (isEmpty(res[0].userInteractionRequestRegistry) ? "" : res[0].userInteractionRequestRegistry.value);
+														config.tfrldpc = (isEmpty(res[0].transformerFactoryRegistry) ? "" : res[0].transformerFactoryRegistry.value);
+														config.trldpc = (isEmpty(res[0].transformerRegistry) ? "" : res[0].transformerRegistry.value);
+														
                             completeMenuLinks();
                             registerConfigData(initFunc);
                         }
@@ -65,7 +83,7 @@ function registerConfigData(initFunc) {
                         if (results.length == 0) {
                             if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
                                 // if no result, it's time to create a config
-                                window.location.href = 'configuration.html?configRegistry=' + configRegistry + '&action=newConfig';
+                                window.location.href = 'configuration.html?platformURI=' + platformURI + '&configRegistry=' + configRegistry + '&action=newConfig';
                             }
                             else {
                                 initFunc();
@@ -123,7 +141,6 @@ function registerConfigData(initFunc) {
                                                 " ?s crldpc:ir-ldpc ?irldpc . " +
                                                 " ?s crldpc:tr-ldpc ?trldpc . " +
                                                 " ?s crldpc:tfr-ldpc ?tfrldpc . " +
-                                                " ?s crldpc:wr-ldpc ?wrldpc . " +
                                                 " }";
 
                                         configStore.execute(query, function (success, res) {
@@ -135,7 +152,6 @@ function registerConfigData(initFunc) {
                                                 config.irldpc = res[0].irldpc.value;
                                                 config.tfrldpc = res[0].tfrldpc.value;
                                                 config.trldpc = res[0].trldpc.value;
-                                                config.wrldpc = res[0].wrldpc.value;
                                             }
                                             initFunc();
                                         });

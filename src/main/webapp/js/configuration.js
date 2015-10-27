@@ -77,7 +77,6 @@ function useConfig() {
 	config.irldpc = configItem.irldpc;
 	config.trldpc = configItem.trldpc;
 	config.tfrldpc = configItem.tfrldpc;
-	config.wrldpc = configItem.wrldpc;
 	config.ETag = configItem.ETag;
 	
 	$.cookie(configRegistry, config.uri, { expires: 30, path: '/' });
@@ -147,7 +146,6 @@ function saveConfig() {
 	configItem.irldpc = config.irldpc;
 	configItem.trldpc = config.trldpc;
 	configItem.tfrldpc = config.tfrldpc;
-	configItem.wrldpc = config.wrldpc;
 	
 	var valid = (!isEmpty(configItem.title) & !isEmpty(configItem.description) );
 	
@@ -230,7 +228,6 @@ function saveNewConfig(configItem) {
 								" ?s crldpc:ir-ldpc ?irldpc . " +
 								" ?s crldpc:tr-ldpc ?trldpc . " +
 								" ?s crldpc:tfr-ldpc ?tfrldpc . " +
-								" ?s crldpc:wr-ldpc ?wrldpc . " +
 								" }";
 					
 					configStore.execute(query, function(success, res) {
@@ -242,7 +239,6 @@ function saveNewConfig(configItem) {
 							configItem.irldpc = res[0].irldpc.value;
 							configItem.tfrldpc = res[0].tfrldpc.value;
 							configItem.trldpc = res[0].trldpc.value;
-							configItem.wrldpc = res[0].wrldpc.value;
 							configItem.ETag = request.getResponseHeader('ETag');
 						}
 						
@@ -300,7 +296,6 @@ function fillPropertyList(configItem) {
 	$('#selConfigIrldpc').text(configItem.irldpc);
 	$('#selConfigTrldpc').text(configItem.trldpc);
 	$('#selConfigTfrldpc').text(configItem.tfrldpc);
-	$('#selConfigWrldpc').text(configItem.wrldpc);
 	
 	if(configItem.uri == config.uri) {
 		$('#inUseBadge').show();
@@ -349,7 +344,6 @@ function getConfigInfo(callbackFunctions) {
 														" ?s crldpc:ir-ldpc ?irldpc . " +
 														" ?s crldpc:tr-ldpc ?trldpc . " +
 														" ?s crldpc:tfr-ldpc ?tfrldpc . " +
-														" ?s crldpc:wr-ldpc ?wrldpc . " +
 														" }";
 											
 											configStore.execute(query, function(success, res) {
@@ -362,7 +356,6 @@ function getConfigInfo(callbackFunctions) {
 													configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
 													configItem.tfrldpc = res[0].tfrldpc.value;
 													configItem.trldpc = res[0].trldpc.value;
-													configItem.wrldpc = res[0].wrldpc.value;
 													configItem.ETag = ETag;
 												}
 												configs.push(configItem);

@@ -226,7 +226,7 @@ function saveNewWidget(title, widgetType, data) {
 						'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
             'Slug': title
         },
-        url: config.wrldpc,
+        url: config.uri,
         data: data
     });
 
@@ -414,7 +414,7 @@ function getTLDPCs() {
 
     // Getting "T-LDPC" widgets 
     var query = 'SELECT * WHERE { '
-            + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+            + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> ?child . '
             + '?child <http://purl.org/dc/terms/title> ?title . '
             // + '?child <http://vocab.fusepool.info/wrldpc#type> "T-LDPC" . '
             + '?child ?typeProp "T-LDPC" . '
@@ -445,7 +445,7 @@ function getTLDPCs() {
 
         if (tldpcs.length > 0) {
             query = 'SELECT * WHERE { '
-                    + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+                    + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> ?child . '
                     + '?child <http://www.w3.org/ns/ldp#contains> ?resource . '
                     + 'OPTIONAL { '
                     + '	?resource <http://purl.org/dc/terms/created> ?date . '
@@ -510,7 +510,7 @@ function refreshTLDPCChildList(widget) {
     // showWidgetLoader(widget.id);
 
     var query = 'SELECT * WHERE { '
-            + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> <' + widget.uri + '> . '
+            + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> <' + widget.uri + '> . '
             + '<' + widget.uri + '> <http://www.w3.org/ns/ldp#contains> ?resource . '
             + 'OPTIONAL { '
             + '	?resource <http://purl.org/dc/terms/created> ?date . '
@@ -710,7 +710,7 @@ function getInteractions() {
 
     // Getting "UIR" widgets 
     var query = 'SELECT * WHERE { '
-            + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+            + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> ?child . '
             + '?child <http://purl.org/dc/terms/title> ?title . '
             //  + '?child <http://vocab.fusepool.info/wrldpc#type> "UIR" . '
             + '?child ?typeProp "UIR" . '
@@ -902,7 +902,7 @@ function getSparqlBuilders() {
 
     // Getting "SPARQL" widgets 
     var query = 'SELECT * WHERE { '
-            + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+            + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> ?child . '
             + '?child <http://purl.org/dc/terms/title> ?title . '
             //  + '?child <http://vocab.fusepool.info/wrldpc#type> "SPARQL" . '
             + '?child ?typeProp "SPARQL" . '
@@ -988,7 +988,7 @@ function getHowtos() {
 
     // Getting "HOWTO" widgets 
     var query = 'SELECT * WHERE { '
-            + '<' + config.wrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+            + '<' + config.uri + '> <http://www.w3.org/ns/ldp#contains> ?child . '
             + '?child <http://purl.org/dc/terms/title> ?title . '
             //  + '?child <http://vocab.fusepool.info/wrldpc#type> "HOWTO" . '
             + '?child ?typeProp "HOWTO" . '
