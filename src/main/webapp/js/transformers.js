@@ -50,32 +50,32 @@ function initFileInput() {
 }
 
 function testTransformer() {
-    showLoadingCover();
+  showLoadingCover();
 
-	var acceptHeaderInput = $('#acceptHeader').val();
-	var contentTypeInput = $('#contentType').val();
+	var acceptHeaderInput = $.trim($('#acceptHeader').val());
+	var contentTypeInput = $.trim($('#contentType').val());
 	
-    var acceptHeader = isEmpty(acceptHeaderInput) ? '*/*' : acceptHeaderInput;
-    var contentType = isEmpty(contentTypeInput) ? 'text/plain; charset=utf-8' : contentTypeInput;
+	var acceptHeader = isEmpty(acceptHeaderInput) ? '*/*' : acceptHeaderInput;
+	var contentType = isEmpty(contentTypeInput) ? 'text/plain; charset=utf-8' : contentTypeInput;
 
-    $.ajax({
-        type: 'POST',
-        url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
-		headers: {
-            'Accept': acceptHeader,
-            'Content-Type': contentType
-        },
-        data: selectedText
-    })
-		.done(function (data) {
-				$('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
-				hideLoadingCover();
-		})
-		.fail(function (xhr, textStatus, errorThrown) {
-				hideLoadingCover();
-				$('#resultBox').html('');
-				console.error(xhr, textStatus, errorThrown);
-		});
+	$.ajax({
+		type: 'POST',
+		url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
+	headers: {
+				'Accept': acceptHeader,
+				'Content-Type': contentType
+		},
+		data: selectedText
+	})
+	.done(function (data) {
+		$('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
+		hideLoadingCover();
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
+		hideLoadingCover();
+		$('#resultBox').html('');
+		console.error(xhr, textStatus, errorThrown);
+	});
 }
 
 /*************************/
@@ -246,7 +246,7 @@ function renameTransformer() {
 function registerTransformer() {
     var title = $("#registerTitle").val();
     var description = $("#registerDescription").val();
-    var uri = $("#registerUri").val();
+    var uri = $.trim($("#registerUri").val());
 
     if (isEmpty(title)) {
         alert('Please provide a title');
