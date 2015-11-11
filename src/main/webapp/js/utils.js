@@ -66,6 +66,49 @@ function completeMenuLinks() {
     $('#configurationMenuItem').prop('href', 'configuration.html?platformURI=' + platformURI);
 }
 
+function createDefaultConfig(initFunc) {
+	var configStr = '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+		+ '@prefix dcterms: <http://purl.org/dc/terms/> .  '
+		+ '@prefix crldpc: <http://vocab.fusepool.info/crldpc#> . '
+		+ '<> a ldp:Container, ldp:BasicContainer, crldpc:ConfigurationRegistration ; '
+		+ '	dcterms:title "Default configuration"@en ; '
+		+ '	dcterms:description "Default configuration created automatically by the dashboard."@en ; '
+		+ '	crldpc:sparql-endpoint <' + config.sparqlEndpoint + '> ; '
+		+ '	crldpc:ir-ldpc <' + config.irldpc + '> ; '
+		+ '	crldpc:tfr-ldpc <' + config.tfrldpc + '> ; '
+		+ '	crldpc:tr-ldpc <' + config.trldpc + '> ; '
+		+ '	crldpc:wr-ldpc <> . ';
+	
+	var ajaxRequest = $.ajax({
+		type: 'POST',
+		headers: { 
+			'Content-Type': 'text/turtle',
+			'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel=?type?',
+			'Slug' : 'default-configuration'
+		},
+		url: configRegistry,
+		data: configStr
+	});
+	ajaxRequest.done(function (response, textStatus, request) {
+		
+		var configUri = request.getResponseHeader('Location');
+		
+		var request = $.ajax({	type: "GET",
+								url: configUri,
+								cache: false	});
+													
+		request.done(function(response, textStatus, request) {
+			registerConfigData(initFunc);
+		});
+		request.fail(function(xhr, textStatus, errorThrown){
+			console.error(xhr, textStatus, errorThrown);
+		});
+	});
+	ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+	});
+}
+
 function registerConfigData(initFunc) {
 
     var ajaxRequest = $.ajax({type: "GET",
@@ -83,7 +126,7 @@ function registerConfigData(initFunc) {
                         if (results.length == 0) {
                             if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
                                 // if no result, it's time to create a config
-                                window.location.href = 'configuration.html?platformURI=' + platformURI + '&configRegistry=' + configRegistry + '&action=newConfig';
+																createDefaultConfig(initFunc);
                             }
                             else {
                                 initFunc();

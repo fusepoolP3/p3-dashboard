@@ -8,7 +8,7 @@ $(document).ready(function () {
 });
 
 /*********************/
-/**		General 	**/
+/**			General 		**/
 /*********************/
 
 function initDashboard() {
