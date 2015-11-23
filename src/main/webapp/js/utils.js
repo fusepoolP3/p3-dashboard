@@ -9,7 +9,7 @@ function extractConfigRegistryURI(initFunc) {
         platformURI = set[0];
     }
     else {
-        var inputValue = prompt('Please enter a valid platform URI', 'http://sandbox.fusepool.info:8181/ldp/platform');
+        var inputValue = prompt('Please enter a valid platform URI', 'http://sandbox.fusepool.info/');
         if (inputValue != null) {
             platformURI = inputValue;
         }
@@ -17,47 +17,20 @@ function extractConfigRegistryURI(initFunc) {
             return;
         }
     }
-
-    var ajaxRequest = jQuery.ajax({type: "GET",
-        url: platformURI,
-        headers: {'Accept': 'text/turtle'},
-				cache: false,
-        async: false});
-
-    ajaxRequest.done(function (response, textStatus, responseObj) {
-        var store = rdfstore.create();
-        store.load('text/turtle', response, function (success, results) {
-            if (success) {							
-							var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
-											"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-											"PREFIX fp3: <http://vocab.fusepool.info/fp3#> " +
-											"SELECT * { " +
-											" ?s fp3:dashboardConfigRegistry ?dashboardConfigRegistry " +
-											" OPTIONAL { ?s fp3:sparqlEndpoint ?sparqlEndpoint } " +
-											" OPTIONAL { ?s fp3:userInteractionRequestRegistry ?userInteractionRequestRegistry } " +
-											" OPTIONAL { ?s fp3:transformerFactoryRegistry ?transformerFactoryRegistry } " +
-											" OPTIONAL { ?s fp3:transformerRegistry ?transformerRegistry } " +
-											"}";
-											
-                store.execute(query, function (success, res) {
-                    if (success) {
-                        if (res.length > 0) {
-                            window.configRegistry = res[0].dashboardConfigRegistry.value;
-														
-														// platform defaults
-														config.sparqlEndpoint = (isEmpty(res[0].sparqlEndpoint) ? "" : res[0].sparqlEndpoint.value);
-														config.irldpc = (isEmpty(res[0].userInteractionRequestRegistry) ? "" : res[0].userInteractionRequestRegistry.value);
-														config.tfrldpc = (isEmpty(res[0].transformerFactoryRegistry) ? "" : res[0].transformerFactoryRegistry.value);
-														config.trldpc = (isEmpty(res[0].transformerRegistry) ? "" : res[0].transformerRegistry.value);
-														
-                            completeMenuLinks();
-                            registerConfigData(initFunc);
-                        }
-                    }
-                });
-            }
-        });
-    });
+		
+		P3Platform.getPlatform(platformURI).then(function(p) {
+			platform = p;
+			window.configRegistry = p.getDashboardConfigRegistryURI();
+			
+			// platform defaults
+			config.sparqlEndpoint = p.getSparqlEndpoint();
+			config.irldpc = p.getUserInteractionRequestRegistryURI();
+			config.tfrldpc = p.getTransformerFactoryRegistryURI();
+			config.trldpc = p.getTransformerRegistryURI();
+			
+			completeMenuLinks();
+			registerConfigData(initFunc);
+		});
 }
 
 function completeMenuLinks() {
@@ -254,8 +227,7 @@ function hideLoadingCover() {
 
 function showWidgetLoader(widgetId) {
     if (isEmpty($('#' + widgetId + ' .overlay'))) {
-        $('#' + widgetId).append($('<div>').prop('class', 'overlay'))
-                .append($('<div>').prop('class', 'loading-img'));
+        $('#' + widgetId).append($('<div>').prop('class', 'overlay')).append($('<div>').prop('class', 'loading-img'));
     }
 }
 

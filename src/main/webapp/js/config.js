@@ -1,6 +1,8 @@
 
 var platformURI = "";
 
+var platform;
+
 var config = {};
 
 var widgets = [];

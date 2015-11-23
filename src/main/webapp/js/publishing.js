@@ -12,9 +12,9 @@ $(document).ready(function () {
     extractConfigRegistryURI(initDashboard);
 });
 
-/**************************/
-/**	General 	**/
-/**************************/
+/***************************/
+/**				General 				**/
+/***************************/
 
 function initDashboard() {
     Dropzone.autoDiscover = false;
@@ -82,7 +82,7 @@ function addCollapseFunctionality(widgetId) {
 }
 
 /*************************/
-/**		Widget common 	**/
+/**			Widget common 	**/
 /*************************/
 
 function drawWidgetsByType(widgetType) {	// TODO work with orderIndex

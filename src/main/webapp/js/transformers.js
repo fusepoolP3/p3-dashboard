@@ -61,7 +61,7 @@ function testTransformer() {
 	$.ajax({
 		type: 'POST',
 		url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
-	headers: {
+		headers: {
 				'Accept': acceptHeader,
 				'Content-Type': contentType
 		},
@@ -109,7 +109,7 @@ function getTransformers() {
         var first = true;
 
         if (transformers.length > 0) {
-            jQuery.each(transformers, function (i, transformer) {
+            $.each(transformers, function (i, transformer) {
                 if (first) {
                     first = false;
                     selectedTransformer = transformer;
@@ -244,43 +244,26 @@ function renameTransformer() {
 }
 
 function registerTransformer() {
-    var title = $("#registerTitle").val();
-    var description = $("#registerDescription").val();
-    var uri = $.trim($("#registerUri").val());
+	var title = $("#registerTitle").val();
+	var description = $("#registerDescription").val();
+	var uri = $.trim($("#registerUri").val());
 
-    if (isEmpty(title)) {
-        alert('Please provide a title');
-    }
-    else if (isEmpty(uri)) {
-        alert('Please provide a URI');
-    }
-    else {
-        var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
-                + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-		+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-		+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
-                + 'trldpc:transformer <' + uri + '>; '
-                + 'dcterms:title "' + title + '"@en; '
-                + 'dcterms:description "' + description + '". ';
-
-        $.ajax({
-            type: 'POST',
-            headers: {
-                'Content-Type': 'text/turtle',
-		'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
-                'Slug': title
-            },
-            url: config.trldpc,
-            data: data
-        }).done(function (response) {
-            $("#registerTitle").val('');
-            $("#registerDescription").val('');
-            $("#registerUri").val('');
-            getTransformers();
-        }).fail(function (xhr, textStatus, errorThrown) {
-            console.error(xhr, textStatus, errorThrown);
-        });
-    }
+	if (isEmpty(title)) {
+			alert('Please provide a title');
+	}
+	else if (isEmpty(uri)) {
+			alert('Please provide a URI');
+	}
+	else {
+		platform.getTransformerRegistry().then(function(tr) {
+			tr.registerTransformer(uri, title, description).then(function() {
+				$("#registerTitle").val('');
+				$("#registerDescription").val('');
+				$("#registerUri").val('');
+				getTransformers();
+			});
+		});
+	}
 }
 
 function getTransformerByContainer(str) {
