@@ -201,34 +201,11 @@ function renameTransformer() {
             });
 
             deleteRequest.done(function (response) {
-                // check for HTTP_OK or HTTP_NO_CONTENT
-                var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
-                + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-                + '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-                + '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
-                + 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
-                + 'dcterms:title "' + newName + '"@en; '
-                + 'dcterms:description "' + selectedTransformer.description.value + '". ';
-
-                var postRequest = $.ajax({
-                    type: 'POST',
-                    url: selectedTransformer.child.value,
-                    headers: {
-                        'Content-Type': 'text/turtle',
-                        'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
-                        'Slug': newName
-                    },
-                    data: data
-                });
-        
-                postRequest.done(function (response, textStatus, request) {
-                    selectedTransformer.title.value = newName;
-                    $('#transformerList option[value="' + selectedTransformer.child.value + '"]').text(newName);
-                });
-                    
-                postRequest.fail(function (xhr, textStatus, errorThrown) {
-                    console.error(xhr, textStatus, errorThrown);
-                });
+							platform.getTransformerRegistry().then(function(tr) {
+								tr.registerTransformer(selectedTransformer.uri.value, newName, selectedTransformer.description.value).then(function() {
+									getTransformers();
+								});
+							});
             });
 
             deleteRequest.fail(function (xhr, textStatus, errorThrown) {
