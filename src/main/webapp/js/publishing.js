@@ -5,6 +5,7 @@ var refreshController = {};
 refreshController.minSecs = 5;
 refreshController.defSecs = 60;
 var currentAction = "NEW";
+var extensionContentTypes = [ { ext: "json", contentType: "application/json" } ];
 
 $(document).ready(function () {
     "use strict";
@@ -633,6 +634,25 @@ function viewResource(resourceURI) {
     });
 }
 
+function getContentType(file) {
+	if(!isEmpty(file.type)) {
+		return file.type;
+	}
+	else {
+		var re = /(?:\.([^.]+))?$/;
+		var extension = re.exec(file.name)[1];
+		var contentType = "";
+		
+		for(var i=0; i<extensionContentTypes.length; i++) {
+			if(extensionContentTypes[i].ext == extension) {
+				contentType = extensionContentTypes[i].contentType;
+				break;
+			}
+		}		
+		return contentType;
+	}
+}
+
 function uploadFile(file, widget) {
     if (!$.isEmptyObject(file)) {
         showWidgetLoader(widget.id);
@@ -641,7 +661,7 @@ function uploadFile(file, widget) {
             url: widget.uri,
             data: file,
             headers: { "Slug": file.name },
-            contentType: file.type,
+            contentType: getContentType(file),
             processData: false
         });
 
