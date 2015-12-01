@@ -66,7 +66,11 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 
 				$.ajax({
 						type: 'POST',
-						headers: { 'Content-Type': 'text/turtle' },
+						headers: { 
+						  'Content-Type': 'text/turtle',
+						  'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
+						  'Slug': title
+						  },
 						url: main.URI,
 						data: data,
 						async: true
@@ -108,7 +112,11 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 
 				$.ajax({
 						type: 'POST',
-						headers: { 'Content-Type': 'text/turtle' },
+						headers: { 
+						  'Content-Type': 'text/turtle',
+						  'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
+						  'Slug': title
+						  },
 						url: main.URI,
 						data: data,
 						async: true
