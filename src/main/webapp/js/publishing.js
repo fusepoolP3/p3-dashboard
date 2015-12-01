@@ -5,7 +5,14 @@ var refreshController = {};
 refreshController.minSecs = 5;
 refreshController.defSecs = 60;
 var currentAction = "NEW";
-var extensionContentTypes = [ { ext: "json", contentType: "application/json" } ];
+var extensionContentTypes = [	{ ext: "json", contentType: "application/json" },
+															{ ext: "csv", contentType: "text/csv" },
+															{ ext: "ttl", contentType: "text/turtle" },
+															{ ext: "n3", contentType: "text/n3" },
+															{ ext: "nt", contentType: "application/n-triples" },
+															{ ext: "rdf", contentType: "application/xml+rdf" },
+															{ ext: "turtle", contentType: "text/turtle" },
+															{ ext: "xml", contentType: "application/xml" } ];
 
 $(document).ready(function () {
     "use strict";
