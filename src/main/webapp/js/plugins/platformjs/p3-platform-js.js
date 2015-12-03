@@ -8,7 +8,7 @@ function P3Platform() {
 P3Platform.prototype.getPlatform = function (platformURI) {
 
 	/* ************************* Platform ************************* */
-	function Platform(URI, title, comment, label, ldpRoot, sparqlEndpoint, userInteractionRequestRegistry, transformerFactoryRegistry, transformerRegistry, dashboardConfigRegistry) {
+	function Platform(URI, title, comment, label, ldpRoot, sparqlEndpoint, userInteractionRequestRegistry, transformerFactoryRegistry, transformerRegistry, dashboardConfigRegistry, pipelineConfigRegistry) {
 		this.URI = URI;
 		this.title = title;
 		this.comment = comment;
@@ -19,6 +19,7 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 		this.transformerFactoryRegistry = transformerFactoryRegistry;
 		this.transformerRegistry = transformerRegistry;
 		this.dashboardConfigRegistry = dashboardConfigRegistry;
+		this.pipelineConfigRegistry = pipelineConfigRegistry;
 	}
 	Platform.prototype.getPlatformURI = function () { return this.URI; };
 	Platform.prototype.getLdpRoot = function () { return this.ldpRoot; };
@@ -39,6 +40,7 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 	};
 	Platform.prototype.getTransformerRegistryURI = function () { return this.transformerRegistry.URI; };
 	Platform.prototype.getDashboardConfigRegistryURI = function () { return this.dashboardConfigRegistry; };
+	Platform.prototype.getPipelineConfigRegistryURI = function () { return this.pipelineConfigRegistry; };
 	
 	/* ************************* TransformerRegistry ************************* */
 	function TransformerRegistry(transformerRegistryURI) {
@@ -58,15 +60,17 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 
 				var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
 								+ '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-								+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-								+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
+								+ '<> a trldpc:TransformerRegistration; '
 								+ 'trldpc:transformer <' + transformerURI + '>; '
 								+ descriptionProp
 								+ 'dcterms:title "' + title + '"@en . ';
 
 				$.ajax({
 						type: 'POST',
-						headers: { 'Content-Type': 'text/turtle' },
+						headers: {
+							'Content-Type': 'text/turtle',
+							'Slug': title
+						},
 						url: main.URI,
 						data: data,
 						async: true
@@ -100,15 +104,17 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 
 				var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
 								+ '@prefix tfrldpc: <http://vocab.fusepool.info/tfrldpc#> . '
-								+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-								+ '<> a ldp:Container, ldp:BasicContainer, tfrldpc:TransformerFactoryRegistration; '
+								+ '<> a tfrldpc:TransformerFactoryRegistration; '
 								+ 'tfrldpc:transformerFactory <' + transformerFactoryURI + '>; '
 								+ descriptionProp
 								+ 'dcterms:title "' + title + '"@en . ';
 
 				$.ajax({
 						type: 'POST',
-						headers: { 'Content-Type': 'text/turtle' },
+						headers: {
+							'Content-Type': 'text/turtle',
+							'Slug': title
+						},
 						url: main.URI,
 						data: data,
 						async: true
@@ -146,6 +152,7 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 											" OPTIONAL { ?s fp3:transformerFactoryRegistry ?transformerFactoryRegistry } " +
 											" OPTIONAL { ?s fp3:transformerRegistry ?transformerRegistry } " +
 											" OPTIONAL { ?s fp3:dashboardConfigRegistry ?dashboardConfigRegistry } " +
+											" OPTIONAL { ?s fp3:pipelineConfigRegistry ?pipelineConfigRegistry } " +
 											"}";
 					
 					configStore.execute(query, function (success, res) {
@@ -159,13 +166,14 @@ P3Platform.prototype.getPlatform = function (platformURI) {
 							var transformerFactoryRegistry = (isEmpty(res[0].transformerFactoryRegistry) ? "" : res[0].transformerFactoryRegistry.value);
 							var transformerRegistry = (isEmpty(res[0].transformerRegistry) ? "" : res[0].transformerRegistry.value);
 							var dashboardConfigRegistry = (isEmpty(res[0].dashboardConfigRegistry) ? "" : res[0].dashboardConfigRegistry.value);
+							var pipelineConfigRegistry = (isEmpty(res[0].pipelineConfigRegistry) ? "" : res[0].pipelineConfigRegistry.value);
 							
 							var transformerRegistryObj = new TransformerRegistry(transformerRegistry);
 							var transformerFactoryRegistryObj = new TransformerFactoryRegistry(transformerFactoryRegistry);
 							
 							var platform = new Platform(platformURI, title, comment, label, ldpRoot, sparqlEndpoint,
 																				userInteractionRequestRegistry, transformerFactoryRegistryObj,
-																				transformerRegistryObj, dashboardConfigRegistry);
+																				transformerRegistryObj, dashboardConfigRegistry, pipelineConfigRegistry);
 							
 							resolve(platform);
 						}

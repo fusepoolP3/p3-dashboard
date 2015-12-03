@@ -211,8 +211,6 @@ function renameTransformer() {
             deleteRequest.fail(function (xhr, textStatus, errorThrown) {
                 console.error(xhr, textStatus, errorThrown);
             });
-            
-
         });
         ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
             console.error(xhr, textStatus, errorThrown);
