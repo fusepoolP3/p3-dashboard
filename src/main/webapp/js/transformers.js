@@ -17,35 +17,39 @@ function initDashboard() {
     hideLoadingCover();
 }
 
+/*************************/
+/**			Transformers	 	**/
+/*************************/
+
 /* Testing */
 
 function initFileInput() {
     $('#browse').click(function () {
-        $('#file').click();
-        return false;
+			$('#file').click();
+			return false;
     });
 
     $('#filePath').click(function () {
-        $('#file').click();
-        return false;
+			$('#file').click();
+			return false;
     });
 
     $('#file').change(function (e) {
-        var filename = $('#file').val();
-        var res = filename.split("\\");
-        filename = res[res.length - 1];
-        $('#filePath').val(filename);
-        var file = e.target.files[0];
-        if (!isEmpty(file)) {
-            showLoadingCover();
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                selectedText = e.target.result;
-                hideLoadingCover();
-            };
-            reader.readAsText(file)
-        }
-        return false;
+			var filename = $('#file').val();
+			var res = filename.split("\\");
+			filename = res[res.length - 1];
+			$('#filePath').val(filename);
+			var file = e.target.files[0];
+			if (!isEmpty(file)) {
+				showLoadingCover();
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					selectedText = e.target.result;
+					hideLoadingCover();
+				};
+				reader.readAsText(file)
+			}
+			return false;
     });
 }
 
@@ -62,25 +66,21 @@ function testTransformer() {
 		type: 'POST',
 		url: selectedTransformer.uri.value + '?config=' + selectedTransformer.child.value,
 		headers: {
-				'Accept': acceptHeader,
-				'Content-Type': contentType
+			'Accept': acceptHeader,
+			'Content-Type': contentType
 		},
 		data: selectedText
 	})
 	.done(function (data) {
-		$('#resultBox').html("<pre class=\"prettyprint lang-xml\" style=\"background-color:transparent;\">" + escapeHTML(data) + "</pre>");
+		$('#resultBox').html("<pre class='prettyprint lang-xml testResult'>" + escapeHTML(data) + "</pre>");
 		hideLoadingCover();
 	})
 	.fail(function (xhr, textStatus, errorThrown) {
 		hideLoadingCover();
-		$('#resultBox').html('');
+		$('#resultBox').html("<pre class='prettyprint lang-xml testResult'>Error: " + errorThrown + " (Please check the console for further information.)</pre>");
 		console.error(xhr, textStatus, errorThrown);
 	});
 }
-
-/*************************/
-/**		Transformers 	**/
-/*************************/
 
 function getTransformers() {
     var query = 'SELECT * WHERE { '
@@ -150,6 +150,9 @@ function deleteTransformer() {
 function onTestClick() {
     $('#testPanel').modal();
     $('#testedTransformerName').text(selectedTransformer.title.value);
+		$('#resultBox').html('');
+		$('#filePath').val('');
+		$('#file').val('');
 }
 
 function renameTransformer() {
@@ -255,6 +258,17 @@ $("#transformerList").change(function () {
     var val = $(this).find("option:selected").val();
     selectedTransformer = getTransformerByContainer(val);
 });
+
+function showTrDetails() {
+    if (!isEmpty(selectedTransformer)) {			
+			$('#infoTrTitle').html(selectedTransformer.title.value);
+			$('#infoTrDescription').html(selectedTransformer.description.value);
+			$('#infoTrResURI').html(selectedTransformer.child.value);
+			$('#infoTrURI').html(selectedTransformer.uri.value);
+			
+			$('#transformerInfo').modal();
+		}
+}
 
 /*********************/
 /**	   Factories 	**/

@@ -2,6 +2,8 @@
 /**		Config	 	**/
 /*********************/
 
+var pfx = { dcterms: "http://purl.org/dc/terms/", crldpc: "http://vocab.fusepool.info/crldpc#", ldp: "http://www.w3.org/ns/ldp#" };
+
 function extractConfigRegistryURI(initFunc) {
 
     var set = getURLParameter("platformURI");
@@ -91,98 +93,86 @@ function registerConfigData(initFunc) {
         async: false});
 
     ajaxRequest.done(function (response, textStatus, request) {
-        var store = rdfstore.create();
-        store.load('text/turtle', response, function (success, results) {
-            if (success) {
-                store.execute("SELECT * { ?s <http://www.w3.org/ns/ldp#contains> ?o }", function (success, results) {
-                    if (success) {
-                        if (results.length == 0) {
-                            if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
-                                // if no result, it's time to create a config
-																createDefaultConfig(initFunc);
-                            }
-                            else {
-                                initFunc();
-                                return;
-                            }
-                        }
-                        else {
-                            var configUri = "";
-                            //if there is only one config, use that one
-                            if (results.length == 1) {
-                                configUri = results[0].o.value;
-                                $.cookie(configRegistry, configUri, {expires: 30, path: '/'});
-                            }
-                            else {
-                                // check if one of the configs are stored in cookie
-                                if (!isEmpty($.cookie(configRegistry))) {
-                                    var foundOne = false;
-                                    for (var i = 0; i < results.length; i++) {
-                                        if (results[i].o.value == $.cookie(configRegistry)) {
-                                            configUri = results[i].o.value;
-                                            foundOne = true;
-                                            break;
-                                        }
-                                    }
-                                    // if we have a config uri stored in cookie for this
-                                    // configRegistry but it's not in there anymore, delete cookie
-                                    if (!foundOne) {
-                                        $.removeCookie(configRegistry);
-                                    }
-                                }
-                                // if couldnt find one already selected, choose one
-                                if (isEmpty(configUri)) {
-                                    // TODO select based on date
-                                    var configUri = results[0].o.value;
-                                    $.cookie(configRegistry, configUri, {expires: 30, path: '/'});
-                                }
-                            }
+			
+			rdf.parseTurtle(response, function (s, graph) {
+				
+				var configRegistryGraph = rdf.cf.Graph(graph);
+					
+				var configURIs = configRegistryGraph.node(configRegistry).out("http://www.w3.org/ns/ldp#contains").literal();
+				if (configURIs.length == 0) {
+						if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
+								// if no result, it's time to create a config
+								createDefaultConfig(initFunc);
+						}
+						else {
+								initFunc();
+								return;
+						}
+				}
+				else {
+						var configUri = "";
+						//if there is only one config, use that one
+						if (configURIs.length == 1) {
+								configUri = configURIs[0];
+								$.cookie(configRegistry, configUri, {expires: 30, path: '/'});
+						}
+						else {
+								// check if one of the configs are stored in cookie
+								if (!isEmpty($.cookie(configRegistry))) {
+										var foundOne = false;
+										for (var i = 0; i < configURIs.length; i++) {
+												if (configURIs[i] == $.cookie(configRegistry)) {
+														configUri = configURIs[i];
+														foundOne = true;
+														break;
+												}
+										}
+										// if we have a config uri stored in cookie for this
+										// configRegistry but it's not in there anymore, delete cookie
+										if (!foundOne) {
+												$.removeCookie(configRegistry);
+										}
+								}
+								// if couldnt find one already selected, choose one
+								if (isEmpty(configUri)) {
+										// TODO select based on date
+										var configUri = configURIs[0];
+										$.cookie(configRegistry, configUri, { expires: 30, path: '/' });
+								}
+						}
 
-                            var request = $.ajax({type: "GET",
-                                url: configUri,
-																headers: {'Accept': 'text/turtle'},
-                                async: false,
-                                cache: false});
-
-                            request.done(function (response, textStatus, request) {
-                                var configStore = rdfstore.create();
-                                configStore.load('text/turtle', response, function (success, res) {
-                                    if (success) {
-                                        var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
-                                                "PREFIX crldpc: <http://vocab.fusepool.info/crldpc#> " +
-                                                "SELECT * { " +
-                                                " ?s dcterms:title ?title . " +
-                                                " ?s dcterms:description ?description . " +
-                                                " ?s crldpc:sparql-endpoint ?sparqlEndpoint . " +
-                                                " ?s crldpc:ir-ldpc ?irldpc . " +
-                                                " ?s crldpc:tr-ldpc ?trldpc . " +
-                                                " ?s crldpc:tfr-ldpc ?tfrldpc . " +
-                                                " }";
-
-                                        configStore.execute(query, function (success, res) {
-                                            if (success) {
-                                                config.uri = res[0].s.value;
-                                                config.title = res[0].title.value;
-                                                config.description = res[0].description.value;
-                                                config.sparqlEndpoint = res[0].sparqlEndpoint.value;
-                                                config.irldpc = res[0].irldpc.value;
-                                                config.tfrldpc = res[0].tfrldpc.value;
-                                                config.trldpc = res[0].trldpc.value;
-                                            }
-                                            initFunc();
-                                        });
-                                    }
-                                });
-                            });
-                            request.fail(function (response, textStatus, statusLabel) {
-                            });
-                        }
-                    }
-                });
-            }
-        });
+						var request = $.ajax({type: "GET",
+								url: configUri,
+								headers: { 'Accept': 'text/turtle' },
+								async: false,
+								cache: false
+						});
+						request.done(function (response, textStatus, request) {
+							
+							rdf.parseTurtle(response, function (s, graph) {
+								
+								var configGraph = rdf.cf.Graph(graph);
+								
+								var configURIs = configGraph.node(configUri).out(pfx.ldp + "contains").literal();
+								
+								config.uri = configUri;
+								config.title = configGraph.node(configUri).out(pfx.dcterms + "title").literal().shift();
+								config.description = configGraph.node(configUri).out(pfx.dcterms + "description").literal().shift();
+								config.sparqlEndpoint = configGraph.node(configUri).out(pfx.crldpc + "sparql-endpoint").literal().shift();
+								config.irldpc = configGraph.node(configUri).out(pfx.crldpc + "ir-ldpc").literal().shift();
+								config.trldpc = configGraph.node(configUri).out(pfx.crldpc + "tr-ldpc").literal().shift();
+								config.tfrldpc = configGraph.node(configUri).out(pfx.crldpc + "tfr-ldpc").literal().shift();
+								
+								initFunc();
+							});
+						});
+						request.fail(function (response, textStatus, statusLabel) {
+						});
+				}
+			});
     });
     ajaxRequest.fail(function (response, textStatus, statusLabel) {
+			
     });
 }
 

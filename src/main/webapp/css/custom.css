@@ -156,6 +156,8 @@ body > .header .logo {
 
 #resultBox  > pre {
 	font-size: 11px;
+	background-color:transparent;
+	border: none;
 }
 
 .left-side {

@@ -216,46 +216,34 @@ function saveNewConfig(configItem) {
 								cache: false	});
 													
 		request.done(function(response, textStatus, request) {
-			var configStore = rdfstore.create();
-			configStore.load('text/turtle', response, function(success, res) {
-				if(success) {
-					var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
-								"PREFIX crldpc: <http://vocab.fusepool.info/crldpc#> " +
-								"SELECT * { " +
-								" ?s dcterms:title ?title . " +
-								" ?s dcterms:description ?description . " +
-								" ?s crldpc:sparql-endpoint ?sparqlEndpoint . " +
-								" ?s crldpc:ir-ldpc ?irldpc . " +
-								" ?s crldpc:tr-ldpc ?trldpc . " +
-								" ?s crldpc:tfr-ldpc ?tfrldpc . " +
-								" }";
-					
-					configStore.execute(query, function(success, res) {
-						if(success) {
-							configItem.uri = res[0].s.value;
-							configItem.title = res[0].title.value;
-							configItem.description = res[0].description.value;
-							configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
-							configItem.irldpc = res[0].irldpc.value;
-							configItem.tfrldpc = res[0].tfrldpc.value;
-							configItem.trldpc = res[0].trldpc.value;
-							configItem.ETag = request.getResponseHeader('ETag');
-						}
-						
-						configs.push(configItem);
-						if(configs.length == 1) {
-							config = configItem;
-						}
-						
-						fillConfigList();
-						fillPropertyList();
-						
-						$('#configTitle').val('');
-						$('#configDescription').val('');
-					
-						$('#newConfigPanel').modal('hide');
-					});
+			
+			rdf.parseTurtle(response, function (s, graph) {
+				
+				var configGraph = rdf.cf.Graph(graph);
+				
+				var configURIs = configGraph.node(configUri).out(pfx.dcterms + "title").literal();
+			
+				configItem.uri = configUri;
+				configItem.title = configGraph.node(configUri).out(pfx.dcterms + "title").literal().shift();
+				configItem.description = configGraph.node(configUri).out(pfx.dcterms + "description").literal().shift();
+				configItem.sparqlEndpoint = configGraph.node(configUri).out(pfx.crldpc + "sparql-endpoint").literal().shift();
+				configItem.irldpc = configGraph.node(configUri).out(pfx.crldpc + "ir-ldpc").literal().shift();
+				configItem.trldpc = configGraph.node(configUri).out(pfx.crldpc + "tr-ldpc").literal().shift();
+				configItem.tfrldpc = configGraph.node(configUri).out(pfx.crldpc + "tfr-ldpc").literal().shift();
+				configItem.ETag = request.getResponseHeader('ETag');
+				
+				configs.push(configItem);
+				if(configs.length == 1) {
+					config = configItem;
 				}
+				
+				fillConfigList();
+				fillPropertyList();
+				
+				$('#configTitle').val('');
+				$('#configDescription').val('');
+			
+				$('#newConfigPanel').modal('hide');
 			});
 		});
 		request.fail(function(response, textStatus, statusLabel){});
@@ -313,67 +301,53 @@ function getConfigInfo(callbackFunctions) {
 								cache: false	});
 			
 	ajaxRequest.done(function(response, textStatus, request) {
-		var store = rdfstore.create();
-		store.load('text/turtle', response, function(success, results) {
-			if(success) {
-				store.execute("SELECT * { ?s <http://www.w3.org/ns/ldp#contains> ?o }", function(success, results) {
-					if(success) {
-						if(results.length == 0) {
-							// TODO new config
-						}
-						else {
-							configs = [];
-							var count = 0;
-							for(var i=0; i<results.length; i++) {
-								var configUri = results[i].o.value;
-								var request = $.ajax({	type: "GET",
-														url: configUri,
-														cache: false	});
-															
-								request.done(function(response, textStatus, request) {
-									var ETag = request.getResponseHeader('ETag');
-									var configStore = rdfstore.create();
-									configStore.load('text/turtle', response, function(success, res) {
-										if(success) {
-											var query = "PREFIX dcterms: <http://purl.org/dc/terms/> " +
-														"PREFIX crldpc: <http://vocab.fusepool.info/crldpc#> " +
-														"SELECT * { " +
-														" ?s dcterms:title ?title . " +
-														" ?s dcterms:description ?description . " +
-														" ?s crldpc:sparql-endpoint ?sparqlEndpoint . " +
-														" ?s crldpc:ir-ldpc ?irldpc . " +
-														" ?s crldpc:tr-ldpc ?trldpc . " +
-														" ?s crldpc:tfr-ldpc ?tfrldpc . " +
-														" }";
-											
-											configStore.execute(query, function(success, res) {
-												var configItem = {};
-												if(success) {
-													configItem.uri = res[0].s.value;
-													configItem.title = res[0].title.value;
-													configItem.description = res[0].description.value;
-													configItem.irldpc = res[0].irldpc.value;
-													configItem.sparqlEndpoint = res[0].sparqlEndpoint.value;
-													configItem.tfrldpc = res[0].tfrldpc.value;
-													configItem.trldpc = res[0].trldpc.value;
-													configItem.ETag = ETag;
-												}
-												configs.push(configItem);
-												count++;
-												if(results.length == count) {
-													for(var j=0;j<callbackFunctions.length;j++) {
-														callbackFunctions[j]();
-													}
-												}
-											});
-										}
-									});
-								});
-								request.fail(function(response, textStatus, statusLabel){});								
+
+		rdf.parseTurtle(response, function (s, graph) {
+			
+			var configRegistryGraph = rdf.cf.Graph(graph);
+			
+			var configURIs = configRegistryGraph.node(configRegistry).out(pfx.ldp + "contains").literal();
+		
+			if(configURIs.length > 0) {
+				configs = [];
+				var count = 0;
+				for(var i=0; i<configURIs.length; i++) {
+					
+					$.ajaxPrefilter(function(options, originalOptions, jqXHR) { jqXHR.opt = originalOptions;});
+					var request = $.ajax({	type: "GET",
+											url: configURIs[i],
+											cache: false	});
+					
+					request.done(function(response, textStatus, request, url) {
+						var configURI = request.opt.url;
+						
+						var ETag = request.getResponseHeader('ETag');
+									
+						rdf.parseTurtle(response, function (s, graph) {
+							
+							var configGraph = rdf.cf.Graph(graph);
+							
+							var configItem = {};
+							
+							configItem.uri = configURI;
+							configItem.title = configGraph.node(configURI).out(pfx.dcterms + "title").literal().shift();
+							configItem.description = configGraph.node(configURI).out(pfx.dcterms + "description").literal().shift();
+							configItem.sparqlEndpoint = configGraph.node(configURI).out(pfx.crldpc + "sparql-endpoint").literal().shift();
+							configItem.irldpc = configGraph.node(configURI).out(pfx.crldpc + "ir-ldpc").literal().shift();
+							configItem.trldpc = configGraph.node(configURI).out(pfx.crldpc + "tr-ldpc").literal().shift();
+							configItem.tfrldpc = configGraph.node(configURI).out(pfx.crldpc + "tfr-ldpc").literal().shift();
+							configItem.ETag = ETag;
+							
+							configs.push(configItem);
+							count++;
+							if(configURIs.length == count) {
+								for(var j=0;j<callbackFunctions.length;j++) {
+									callbackFunctions[j]();
+								}
 							}
-						}
-					}
-				});
+						});
+					});
+				}
 			}
 		});
 	});

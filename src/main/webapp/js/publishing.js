@@ -600,7 +600,9 @@ function getResourceURI(resourceURI) {
 }
 
 function viewResource(resourceURI) {
+    openInNewTab(resourceURI);
 
+		/*
     var ajaxRequest = $.ajax({type: "GET",
         url: resourceURI,
         cache: false});
@@ -639,6 +641,7 @@ function viewResource(resourceURI) {
     });
     ajaxRequest.fail(function (response, textStatus, statusLabel) {
     });
+		*/
 }
 
 function getContentType(file) {

@@ -24,6 +24,8 @@
 			<script type="text/javascript" src="js/plugins/uduvudu/lib/rdf_store.js"></script>
 			<script type="text/javascript" src="js/plugins/uduvudu/matcher.js"></script>
 			<script type="text/javascript" src="js/plugins/uduvudu/src/uduvudu.js"></script>
+			<!-- Rdf-Ext -->
+			<script type="text/javascript" src="js/plugins/rdfext/rdf-ext.min.js"></script>
 			<!-- PlatformJS -->
 			<script type="text/javascript" src="js/plugins/platformjs/p3-platform-js.js"></script>
 			<!-- Sunlight syntax highlighter -->
@@ -57,113 +59,103 @@
 		<!-- LOADING -->
 		<div id="loadingCover">&nbsp;</div>
 	
-        <!-- header logo: style can be found in header.less -->
-        <header id="siteHeader" class="header">
-            <a href="index.html" class="logo">
-                <img src="img/small-logo.png" title="Fusepool P3 Dashboard" alt="Fusepool P3 Dashboard" />
-            </a>
-            <!-- Header Navbar: style can be found in header.less -->
-            <nav class="navbar navbar-static-top" role="navigation">
-                <!-- Sidebar toggle button-->
-                <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a>
-                <div class="navbar-right">
-                    <ul class="nav navbar-nav">
-                    </ul>
-                </div>
-            </nav>
-        </header>
+			<!-- header logo: style can be found in header.less -->
+			<header id="siteHeader" class="header">
+				<a href="index.html" class="logo">
+						<img src="img/small-logo.png" title="Fusepool P3 Dashboard" alt="Fusepool P3 Dashboard" />
+				</a>
+				<!-- Header Navbar: style can be found in header.less -->
+				<nav class="navbar navbar-static-top" role="navigation">
+					<!-- Sidebar toggle button-->
+					<a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<div class="navbar-right">
+						<ul class="nav navbar-nav">
+						</ul>
+					</div>
+				</nav>
+			</header>
 		
-        <div class="wrapper row-offcanvas row-offcanvas-left bg-grey">
-			
-            <!-- Menu column. contains the logo and sidebar -->
-            <aside id="menuPanel" class="left-side sidebar-offcanvas">
-                <!-- sidebar: style can be found in sidebar.less -->
-                <section class="sidebar">
-                    <!-- sidebar menu: : style can be found in sidebar.less -->
-                    <ul class="sidebar-menu">
-                        <li class="active">
-                            <a href="index.html" id="publishingMenuItem">
-                                <i class="fa fa-dashboard"></i> <span>Publishing</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="transformers.html" id="transformersMenuItem">
-                                <i class="fa fa-rocket"></i> <span>Transformers</span> <small id="transformerCountMenu" class="badge pull-right bg-green">0</small>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="configuration.html" id="configurationMenuItem">
-                                <i class="fa fa-wrench"></i> <span>Configuration</span>
-                            </a>
-                        </li>
-                    </ul>
-                </section>
-                <!-- /.sidebar -->
-            </aside>
+			<div class="wrapper row-offcanvas row-offcanvas-left bg-grey">
+		
+					<!-- Menu column. contains the logo and sidebar -->
+					<aside id="menuPanel" class="left-side sidebar-offcanvas">
+						<!-- sidebar: style can be found in sidebar.less -->
+						<section class="sidebar">
+							<!-- sidebar menu: : style can be found in sidebar.less -->
+							<ul class="sidebar-menu">
+								<li class="active">
+									<a href="index.html" id="publishingMenuItem">
+										<i class="fa fa-dashboard"></i> <span>Publishing</span>
+									</a>
+								</li>
+								<li>
+									<a href="transformers.html" id="transformersMenuItem">
+										<i class="fa fa-rocket"></i> <span>Transformers</span> <small id="transformerCountMenu" class="badge pull-right bg-green">0</small>
+									</a>
+								</li>
+								<li>
+									<a href="configuration.html" id="configurationMenuItem">
+										<i class="fa fa-wrench"></i> <span>Configuration</span>
+									</a>
+								</li>
+							</ul>
+						</section>
+						<!-- /.sidebar -->
+					</aside>
 
-            <!-- Main panel. Contains the navbar and content of the page -->
-            <aside id="mainPanel" class="right-side bg-grey">
-			
-                <!-- Content Header (Page header) -->
-                <section id="mainHeader" class="content-header">
-                    <!-- Main Buttons -->
-                    <div class="row">
-                        <section class="col-lg-12" >
-							<a class="btn btn-app no-margin" onclick="onNewWidgetClick()"> 
-								<i class="fa fa-plus"></i>
-								New widget
-							</a>
-							<!-- a class="btn btn-app no-margin" data-toggle="modal" data-target="#modalBox">
-								<i class="fa fa-wrench"></i>
-								Widget settings
-							</a -->
-							
-							<div class="pull-right" id="refreshDiv">
-								<div class="box box-info no-margin-bottom padding-10">
-									<input type="checkbox" id="autoRefresh" /> Refresh widgets in every 
-									<input type="text" value="60" id="refreshInterval" /> secs
-									<small style="visibility: visible;" id="countdown">
-										<span title="minutes" id="cd-minutes">00</span>:<span title="seconds" id="cd-seconds">00</span>
-									</small>
-									<button id="refreshNowButton" class="btn btn-sm btn-default" onclick="refreshWidgets()">
-										<i class="fa fa-refresh"></i>
-										 Refresh now
-									</button>
-								</div>
+					<!-- Main panel. Contains the navbar and content of the page -->
+					<aside id="mainPanel" class="right-side bg-grey">
+		
+						<!-- Content Header (Page header) -->
+						<section id="mainHeader" class="content-header">
+							<!-- Main Buttons -->
+							<div class="row">
+								<section class="col-lg-12" >
+									<a class="btn btn-app no-margin" onclick="onNewWidgetClick()"> 
+										<i class="fa fa-plus"></i>
+										New widget
+									</a>
+									<!-- a class="btn btn-app no-margin" data-toggle="modal" data-target="#modalBox">
+										<i class="fa fa-wrench"></i>
+										Widget settings
+									</a -->												
+									<div class="pull-right" id="refreshDiv">
+										<div class="box box-info no-margin-bottom padding-10">
+											<input type="checkbox" id="autoRefresh" /> Refresh widgets in every 
+											<input type="text" value="60" id="refreshInterval" /> secs
+											<small style="visibility: visible;" id="countdown">
+												<span title="minutes" id="cd-minutes">00</span>:<span title="seconds" id="cd-seconds">00</span>
+											</small>
+											<button id="refreshNowButton" class="btn btn-sm btn-default" onclick="refreshWidgets()">
+												<i class="fa fa-refresh"></i>
+												 Refresh now
+											</button>
+										</div>
+									</div>
+								</section>
 							</div>
 						</section>
-					</div>
-                </section>
 
-                <!-- Main content -->
-                <section id="mainContent" class="content bg-grey no-padding-top">
-				
-                    <!-- Main row -->
-                    <div id="firstMainRow" class="row">
-					
-                        <!-- ------------------------------------------- Left col ------------------------------------------- -->
-                        <section id="firstMainColumn" class="col-lg-4 connectedSortable">
-                        </section>
+						<!-- Main content -->
+						<section id="mainContent" class="content bg-grey no-padding-top">		
+							<!-- Main row -->
+							<div id="firstMainRow" class="row">				
+								<!-- ------------------------------------------- Left col ------------------------------------------- -->
+								<section id="firstMainColumn" class="col-lg-4 connectedSortable"></section>					
+								<!-- ------------------------------------------- Middle col ------------------------------------------- -->
+								<section id="secondMainColumn" class="col-lg-4 connectedSortable"></section>					 
+								<!-- -------------------------------------------- Right col ------------------------------------------- -->
+								<section id="thirdMainColumn" class="col-lg-4 connectedSortable"></section>					 
+							</div><!-- /.row (main row) -->
+						</section><!-- /.content -->
 						
-                        <!-- ------------------------------------------- Middle col ------------------------------------------- -->
-                        <section id="secondMainColumn" class="col-lg-4 connectedSortable">
-						</section>
-					   
-                        <!-- -------------------------------------------- Right col ------------------------------------------- -->
-                        <section id="thirdMainColumn" class="col-lg-4 connectedSortable">
-						</section>
-                       
-					   </section>
-					   
-                    </div><!-- /.row (main row) -->
-                </section><!-- /.content -->
-            </aside><!-- /.right-side -->
-        </div><!-- ./wrapper -->
+					</aside><!-- /.right-side -->
+			</div><!-- ./wrapper -->
 		
 		<!-- MODAL FOR NEW WIDGET -->
 		<div class="modal fade" id="newWidgetPanel" tabindex="-1" role="dialog" aria-hidden="true">
@@ -229,26 +221,26 @@
 							<table class="table table-bordered">
 								<tbody>
 									<tr>
-											<td><strong>Widget title</strong></td>
-											<td><span id="infoWidgetTitle"></span></td>
+										<td><strong>Widget title</strong></td>
+										<td><span id="infoWidgetTitle"></span></td>
 									</tr>
 									<tr>
-											<td><strong>T-LDPC URI</strong></td>
-											<td><span id="infoTLDPCURI"></span></td>
+										<td><strong>T-LDPC URI</strong></td>
+										<td><span id="infoTLDPCURI"></span></td>
 									</tr>
 									<tr>
-											<td><strong>Transformer URI</strong></td>
-											<td><span id="infoTransformerURI"></span></td>
+										<td><strong>Transformer URI</strong></td>
+										<td><span id="infoTransformerURI"></span></td>
 									</tr>
 									<tr>
-											<td><strong>Description</strong></td>
-											<td><span id="infoDescription"></span></td>
+										<td><strong>Description</strong></td>
+										<td><span id="infoDescription"></span></td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<div id="previewFooter" class="modal-footer clearfix">
-							<button id="previewCloseButton" type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+						<div id="infoFooter" class="modal-footer clearfix">
+							<button id="infoCloseButton" type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
 						</div>
 					</div>
 				</div><!-- /.modal-content -->
@@ -299,15 +291,12 @@
 		<div id="templates"></div>
 		<div id="visualizer"></div>
 		      
-        <!-- Dropzone -->
-        <script src="js/plugins/dropzone/dropzone.js" type="text/javascript"></script>
-				
-        <!-- iCheck -->
-        <script src="js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
-
-        <!-- AdminLTE App -->
-        <script src="js/AdminLTE/app.js" type="text/javascript"></script>
-
+		<!-- Dropzone -->
+		<script src="js/plugins/dropzone/dropzone.js" type="text/javascript"></script>		
+		<!-- iCheck -->
+		<script src="js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+		<!-- AdminLTE App -->
+		<script src="js/AdminLTE/app.js" type="text/javascript"></script>
 		<!-- Custom JS -->
 		<script src="js/config.js" type="text/javascript"></script>
 		<script src="js/utils.js" type="text/javascript"></script>
