@@ -2,43 +2,48 @@
 /**		Config	 	**/
 /*********************/
 
-var pfx = { dcterms: "http://purl.org/dc/terms/", crldpc: "http://vocab.fusepool.info/crldpc#", ldp: "http://www.w3.org/ns/ldp#" };
+var pfx = {
+	dcterms: "http://purl.org/dc/terms/",
+	crldpc: "http://vocab.fusepool.info/crldpc#",
+	ldp: "http://www.w3.org/ns/ldp#",
+	tr: "http://vocab.fusepool.info/transformer#"
+};
 
 function extractConfigRegistryURI(initFunc) {
 
-    var set = getURLParameter("platformURI");
-    if (set.length > 0) {
-        platformURI = set[0];
-    }
-    else {
-        var inputValue = prompt('Please enter a valid platform URI', 'http://sandbox.fusepool.info/');
-        if (inputValue != null) {
-            platformURI = inputValue;
-        }
-        else {
-            return;
-        }
-    }
+	var set = getURLParameter("platformURI");
+	if (set.length > 0) {
+		platformURI = set[0];
+	}
+	else {
+		var inputValue = prompt('Please enter a valid platform URI', 'http://sandbox.fusepool.info/');
+		if (inputValue != null) {
+			platformURI = inputValue;
+		}
+		else {
+			return;
+		}
+	}
+	
+	P3Platform.getPlatform(platformURI).then(function(p) {
+		platform = p;
+		window.configRegistry = p.getDashboardConfigRegistryURI();
 		
-		P3Platform.getPlatform(platformURI).then(function(p) {
-			platform = p;
-			window.configRegistry = p.getDashboardConfigRegistryURI();
-			
-			// platform defaults
-			config.sparqlEndpoint = p.getSparqlEndpoint();
-			config.irldpc = p.getUserInteractionRequestRegistryURI();
-			config.tfrldpc = p.getTransformerFactoryRegistryURI();
-			config.trldpc = p.getTransformerRegistryURI();
-			
-			completeMenuLinks();
-			registerConfigData(initFunc);
-		});
+		// platform defaults
+		config.sparqlEndpoint = p.getSparqlEndpoint();
+		config.irldpc = p.getUserInteractionRequestRegistryURI();
+		config.tfrldpc = p.getTransformerFactoryRegistryURI();
+		config.trldpc = p.getTransformerRegistryURI();
+		
+		completeMenuLinks();
+		registerConfigData(initFunc);
+	});
 }
 
 function completeMenuLinks() {
-    $('#publishingMenuItem').prop('href', 'index.html?platformURI=' + platformURI);
-    $('#transformersMenuItem').prop('href', 'transformers.html?platformURI=' + platformURI);
-    $('#configurationMenuItem').prop('href', 'configuration.html?platformURI=' + platformURI);
+	$('#publishingMenuItem').prop('href', 'index.html?platformURI=' + platformURI);
+	$('#transformersMenuItem').prop('href', 'transformers.html?platformURI=' + platformURI);
+	$('#configurationMenuItem').prop('href', 'configuration.html?platformURI=' + platformURI);
 }
 
 function createDefaultConfig(initFunc) {
@@ -86,94 +91,94 @@ function createDefaultConfig(initFunc) {
 
 function registerConfigData(initFunc) {
 
-    var ajaxRequest = $.ajax({type: "GET",
-        url: configRegistry,
-        headers: {'Accept': 'text/turtle'},
-        cache: false,
-        async: false});
+	var ajaxRequest = $.ajax({type: "GET",
+			url: configRegistry,
+			headers: {'Accept': 'text/turtle'},
+			cache: false,
+			async: false});
 
-    ajaxRequest.done(function (response, textStatus, request) {
+	ajaxRequest.done(function (response, textStatus, request) {
+		
+		rdf.parseTurtle(response, function (s, graph) {
 			
-			rdf.parseTurtle(response, function (s, graph) {
+			var configRegistryGraph = rdf.cf.Graph(graph);
 				
-				var configRegistryGraph = rdf.cf.Graph(graph);
-					
-				var configURIs = configRegistryGraph.node(configRegistry).out("http://www.w3.org/ns/ldp#contains").literal();
-				if (configURIs.length == 0) {
-						if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
-								// if no result, it's time to create a config
-								createDefaultConfig(initFunc);
-						}
-						else {
-								initFunc();
-								return;
-						}
+			var configURIs = configRegistryGraph.node(configRegistry).out("http://www.w3.org/ns/ldp#contains").literal();
+			if (configURIs.length == 0) {
+				if (window.location.href.indexOf("configuration.html") < 0 || window.location.href.indexOf("action=newConfig") < 0) {
+					// if no result, it's time to create a config
+					createDefaultConfig(initFunc);
 				}
 				else {
-						var configUri = "";
-						//if there is only one config, use that one
-						if (configURIs.length == 1) {
-								configUri = configURIs[0];
-								$.cookie(configRegistry, configUri, {expires: 30, path: '/'});
-						}
-						else {
-								// check if one of the configs are stored in cookie
-								if (!isEmpty($.cookie(configRegistry))) {
-										var foundOne = false;
-										for (var i = 0; i < configURIs.length; i++) {
-												if (configURIs[i] == $.cookie(configRegistry)) {
-														configUri = configURIs[i];
-														foundOne = true;
-														break;
-												}
-										}
-										// if we have a config uri stored in cookie for this
-										// configRegistry but it's not in there anymore, delete cookie
-										if (!foundOne) {
-												$.removeCookie(configRegistry);
-										}
-								}
-								// if couldnt find one already selected, choose one
-								if (isEmpty(configUri)) {
-										// TODO select based on date
-										var configUri = configURIs[0];
-										$.cookie(configRegistry, configUri, { expires: 30, path: '/' });
-								}
-						}
-
-						var request = $.ajax({type: "GET",
-								url: configUri,
-								headers: { 'Accept': 'text/turtle' },
-								async: false,
-								cache: false
-						});
-						request.done(function (response, textStatus, request) {
-							
-							rdf.parseTurtle(response, function (s, graph) {
-								
-								var configGraph = rdf.cf.Graph(graph);
-								
-								var configURIs = configGraph.node(configUri).out(pfx.ldp + "contains").literal();
-								
-								config.uri = configUri;
-								config.title = configGraph.node(configUri).out(pfx.dcterms + "title").literal().shift();
-								config.description = configGraph.node(configUri).out(pfx.dcterms + "description").literal().shift();
-								config.sparqlEndpoint = configGraph.node(configUri).out(pfx.crldpc + "sparql-endpoint").literal().shift();
-								config.irldpc = configGraph.node(configUri).out(pfx.crldpc + "ir-ldpc").literal().shift();
-								config.trldpc = configGraph.node(configUri).out(pfx.crldpc + "tr-ldpc").literal().shift();
-								config.tfrldpc = configGraph.node(configUri).out(pfx.crldpc + "tfr-ldpc").literal().shift();
-								
-								initFunc();
-							});
-						});
-						request.fail(function (response, textStatus, statusLabel) {
-						});
+					initFunc();
+					return;
 				}
-			});
-    });
-    ajaxRequest.fail(function (response, textStatus, statusLabel) {
-			
-    });
+			}
+			else {
+					var configUri = "";
+					//if there is only one config, use that one
+					if (configURIs.length == 1) {
+						configUri = configURIs[0];
+						$.cookie(configRegistry, configUri, {expires: 30, path: '/'});
+					}
+					else {
+						// check if one of the configs are stored in cookie
+						if (!isEmpty($.cookie(configRegistry))) {
+							var foundOne = false;
+							for (var i = 0; i < configURIs.length; i++) {
+								if (configURIs[i] == $.cookie(configRegistry)) {
+									configUri = configURIs[i];
+									foundOne = true;
+									break;
+								}
+							}
+							// if we have a config uri stored in cookie for this
+							// configRegistry but it's not in there anymore, delete cookie
+							if (!foundOne) {
+								$.removeCookie(configRegistry);
+							}
+						}
+						// if couldnt find one already selected, choose one
+						if (isEmpty(configUri)) {
+							// TODO select based on date
+							var configUri = configURIs[0];
+							$.cookie(configRegistry, configUri, { expires: 30, path: '/' });
+						}
+					}
+
+					var request = $.ajax({type: "GET",
+						url: configUri,
+						headers: { 'Accept': 'text/turtle' },
+						async: false,
+						cache: false
+					});
+					request.done(function (response, textStatus, request) {
+						
+						rdf.parseTurtle(response, function (s, graph) {
+							
+							var configGraph = rdf.cf.Graph(graph);
+							
+							var configURIs = configGraph.node(configUri).out(pfx.ldp + "contains").literal();
+							
+							config.uri = configUri;
+							config.title = configGraph.node(configUri).out(pfx.dcterms + "title").literal().shift();
+							config.description = configGraph.node(configUri).out(pfx.dcterms + "description").literal().shift();
+							config.sparqlEndpoint = configGraph.node(configUri).out(pfx.crldpc + "sparql-endpoint").literal().shift();
+							config.irldpc = configGraph.node(configUri).out(pfx.crldpc + "ir-ldpc").literal().shift();
+							config.trldpc = configGraph.node(configUri).out(pfx.crldpc + "tr-ldpc").literal().shift();
+							config.tfrldpc = configGraph.node(configUri).out(pfx.crldpc + "tfr-ldpc").literal().shift();
+							
+							initFunc();
+						});
+					});
+					request.fail(function (response, textStatus, statusLabel) {
+				});
+			}
+		});
+	});
+	ajaxRequest.fail(function (response, textStatus, statusLabel) {
+		
+	});
 }
 
 /** Opens URL in new tab **/

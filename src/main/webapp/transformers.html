@@ -219,24 +219,23 @@
 					<div class="modal-main">
 						<div id="testModalBody" class="modal-body">
 							<div class="form-group">
-								<span class="form-group-btn">
+								<span class="form-group-btn col-md-2">
 									<button id="browse" class="btn btn-default" title="Browse" type="button">
 										<span class="glyphicon glyphicon-paperclip"></span>
 										<span class="glyphicon-button disappearing">Browse</span>
 									</button>
 								</span>
-								<input id="filePath" class="form-control" type="text" readonly="readonly" placeholder="Browse input file">
+								<input id="filePath" class="form-control" type="text" style="width: 300px" readonly="readonly" placeholder="Browse input file">
 							</div>
-							<div class="form-group">
-								<label for="acceptHeader">Accept Header</label>
-								<textarea id="acceptHeader" class="form-control" style="height: 34px;" placeholder="Accept Header (optional)" rows="1"></textarea>
+							<div class="form-group col-md-6">
+								<label class="control-label" for="acceptHeaderSel">Accept Header</label>
+								<select id="acceptHeaderSel" class="form-control"></select>
 							</div>
-							<div class="form-group">
-								<label for="contentType">Content-Type</label>
-								<textarea id="contentType" class="form-control" style="height: 34px;" placeholder="Content-Type (optional)" rows="1"></textarea>
+							<div class="form-group col-md-6">
+								<label class="control-label" for="contentTypeSel">Content-Type</label>
+								<select id="contentTypeSel" class="form-control"></select>
 							</div>
-							<hr />
-							<div class="form-group">
+							<div id="resultPanel" class="form-group" style="display: none;">
 								<label for="resultBox">Result</label>
 								<div id="resultBox" class="well no-padding"></div>
 							</div>

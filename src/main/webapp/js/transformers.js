@@ -56,11 +56,11 @@ function initFileInput() {
 function testTransformer() {
   showLoadingCover();
 
-	var acceptHeaderInput = $.trim($('#acceptHeader').val());
-	var contentTypeInput = $.trim($('#contentType').val());
+	var acceptHeaderVal = $('#acceptHeaderSel').val();
+	var contentTypeVal = $('#contentTypeSel').val();
 	
-	var acceptHeader = isEmpty(acceptHeaderInput) ? '*/*' : acceptHeaderInput;
-	var contentType = isEmpty(contentTypeInput) ? 'text/plain; charset=utf-8' : contentTypeInput;
+	var acceptHeader = isEmpty(acceptHeaderVal) ? '*/*' : acceptHeaderVal;
+	var contentType = isEmpty(contentTypeVal) ? 'text/plain; charset=utf-8' : contentTypeVal;
 
 	$.ajax({
 		type: 'POST',
@@ -73,11 +73,13 @@ function testTransformer() {
 	})
 	.done(function (data) {
 		$('#resultBox').html("<pre class='prettyprint lang-xml testResult'>" + escapeHTML(data) + "</pre>");
+		$('#resultPanel').show();
 		hideLoadingCover();
 	})
 	.fail(function (xhr, textStatus, errorThrown) {
 		hideLoadingCover();
 		$('#resultBox').html("<pre class='prettyprint lang-xml testResult'>Error: " + errorThrown + " (Please check the console for further information.)</pre>");
+		$('#resultPanel').show();
 		console.error(xhr, textStatus, errorThrown);
 	});
 }
@@ -89,42 +91,44 @@ function getTransformers() {
             + '?child <http://vocab.fusepool.info/trldpc#transformer> ?uri . '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/description> ?description . '
-            + '}'
+            + '} '
             + 'OPTIONAL { '
             + '	?child <http://purl.org/dc/terms/created> ?date . '
-            + '}'
+            + '} '
             + '}';
 
     $.ajax({
-        type: 'POST',
-        url: config.sparqlEndpoint,
-        headers: {
-            'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: { query: query }
+			type: 'POST',
+			url: config.sparqlEndpoint,
+			headers: {
+				'Accept': 'application/sparql-results+json',
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			data: { query: query }
     }).done(function (data) {
-        $("#transformerList").empty();
-        transformers = data.results.bindings;
-        var first = true;
+			$("#transformerList").empty();
+			transformers = data.results.bindings;
+			var first = true;
 
-        if (transformers.length > 0) {
-            $.each(transformers, function (i, transformer) {
-                if (first) {
-                    first = false;
-                    selectedTransformer = transformer;
-                    $("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value).prop('selected', 'selected'));
-                }
-                else {
-                    $("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value));
-                }
-            });
-        }
-        $("#transformerCount").text(transformers.length);
-        $("#transformerCountMenu").text(transformers.length);
+			if (transformers.length > 0) {
+				$.each(transformers, function (i, transformer) {
+					if (first) {
+						first = false;
+						selectedTransformer = transformer;
+						$("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value).prop('selected', 'selected'));
+					}
+					else {
+						$("#transformerList").append($('<option>').text(transformer.title.value).prop("title", transformer.child.value).val(transformer.child.value));
+					}
+					transformer.supportedInputFormats = [];
+					transformer.supportedOutputFormats = [];
+				});
+			}
+			$("#transformerCount").text(transformers.length);
+			$("#transformerCountMenu").text(transformers.length);
 
     }).fail(function (xhr, textStatus, errorThrown) {
-        console.error(xhr, textStatus, errorThrown);
+			console.error(xhr, textStatus, errorThrown);
     });
 }
 
@@ -148,77 +152,122 @@ function deleteTransformer() {
 }
 
 function onTestClick() {
-    $('#testPanel').modal();
-    $('#testedTransformerName').text(selectedTransformer.title.value);
-		$('#resultBox').html('');
-		$('#filePath').val('');
-		$('#file').val('');
+		if(isEmpty(selectedTransformer.supportedInputFormats)) {
+			
+			selectedTransformer.supportedInputFormats = [];
+			selectedTransformer.supportedOutputFormats = [];
+			
+			// query the transformer to get the list of supported input formats
+			var ajaxRequest = $.ajax({
+				type: 'GET',
+				url: selectedTransformer.uri.value,
+			});
+
+			ajaxRequest.done(function (response, textStatus, request) {				
+				rdf.parseTurtle(response, function (s, graph) {
+			
+					var trDetails = rdf.cf.Graph(graph);
+					
+					selectedTransformer.supportedInputFormats = trDetails.node(selectedTransformer.uri.value).out(pfx.tr + "supportedInputFormat").literal();
+					selectedTransformer.supportedOutputFormats = trDetails.node(selectedTransformer.uri.value).out(pfx.tr + "supportedOutputFormat").literal();
+					
+					initTestPanel();
+				});
+			});
+			ajaxRequest.fail(function() {
+				initTestPanel();
+			});
+		}
+		else {
+			initTestPanel();
+		}
+}
+
+function initTestPanel() {
+  $('#testPanel').modal();
+	$('#testedTransformerName').text(selectedTransformer.title.value);
+	
+	$('#acceptHeaderSel').empty();
+  $('#acceptHeaderSel').append($('<option>').val('').text('Select from the list (optional)'));
+	for(var i=0; i<selectedTransformer.supportedInputFormats.length; i++) {
+    $('#acceptHeaderSel').append($('<option>').val(selectedTransformer.supportedInputFormats[i]).text(selectedTransformer.supportedInputFormats[i]));
+	}
+	
+	$('#contentTypeSel').empty();
+  $('#contentTypeSel').append($('<option>').val('').text('Select from the list (optional)'));
+	for(var i=0; i<selectedTransformer.supportedOutputFormats.length; i++) {
+    $('#contentTypeSel').append($('<option>').val(selectedTransformer.supportedOutputFormats[i]).text(selectedTransformer.supportedOutputFormats[i]));
+	}
+	
+	$('#resultBox').html('');
+	$('#filePath').val('');
+	$('#file').val('');
+	$('#resultPanel').hide();
 }
 
 function renameTransformer() {
+	var newName = prompt('New name', selectedTransformer.title.value);
+	if (newName != null) {
+		var ajaxRequest = $.ajax({
+			type: 'GET',
+			url: selectedTransformer.child.value,
+		});
 
-    var newName = prompt('New name', selectedTransformer.title.value);
-    if (newName != null) {
-        var ajaxRequest = $.ajax({
-            type: 'GET',
-            url: selectedTransformer.child.value,
-        });
+		ajaxRequest.done(function (response, textStatus, request) {
+				
+			// Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
+			// Re-enable following once supported.
+			/* As was:
+			var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
+							+ '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
+							+ '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+							+ '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
+							+ 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
+							+ 'dcterms:title "' + newName + '"@en; '
+							+ 'dcterms:description "' + selectedTransformer.description.value + '". ';
 
-        ajaxRequest.done(function (response, textStatus, request) {
-            
-            // Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
-            // Re-enable following once supported.
-            /* As was:
-            var data = '@prefix dcterms: <http://purl.org/dc/terms/> . '
-                    + '@prefix trldpc: <http://vocab.fusepool.info/trldpc#> . '
-                    + '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
-                    + '<> a ldp:Container, ldp:BasicContainer, trldpc:TransformerRegistration; '
-                    + 'trldpc:transformer <' + selectedTransformer.uri.value + '>; '
-                    + 'dcterms:title "' + newName + '"@en; '
-                    + 'dcterms:description "' + selectedTransformer.description.value + '". ';
+			var ETag = request.getResponseHeader('ETag');
+			var putRequest = $.ajax({
+				type: 'PUT',
+				url: selectedTransformer.child.value,
+				headers: {
+					'Content-Type': 'text/turtle',
+					'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
+					'If-Match': ETag
+				},
+				data: data
+			});
+			putRequest.done(function (response, textStatus, request) {
+				$('#transformerList option[value="' + selectedTransformer.child.value + '"]').text(newName);
+			});
+			putRequest.fail(function (xhr, textStatus, errorThrown) {
+				console.error(xhr, textStatus, errorThrown);
+			});
+			*/
+			 
+			// Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
+			// Implement update/overwrite as delete + create
+			var deleteRequest = $.ajax({
+				type: 'DELETE',
+				url: selectedTransformer.child.value,
+			});
 
-            var ETag = request.getResponseHeader('ETag');
-            var putRequest = $.ajax({
-                type: 'PUT',
-                url: selectedTransformer.child.value,
-                headers: {
-                    'Content-Type': 'text/turtle',
-                    'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'",
-                    'If-Match': ETag
-                },
-                data: data
-            });
-            putRequest.done(function (response, textStatus, request) {
-                $('#transformerList option[value="' + selectedTransformer.child.value + '"]').text(newName);
-            });
-            putRequest.fail(function (xhr, textStatus, errorThrown) {
-                console.error(xhr, textStatus, errorThrown);
-            });
-            */
-           
-            // Virtuoso LDP: Doesn't support LDP resource updates using PUT at present.
-            // Implement update/overwrite as delete + create
-            var deleteRequest = $.ajax({
-                type: 'DELETE',
-                url: selectedTransformer.child.value,
-            });
+			deleteRequest.done(function (response) {
+				platform.getTransformerRegistry().then(function(tr) {
+					tr.registerTransformer(selectedTransformer.uri.value, newName, selectedTransformer.description.value).then(function() {
+						getTransformers();
+					});
+				});
+			});
 
-            deleteRequest.done(function (response) {
-							platform.getTransformerRegistry().then(function(tr) {
-								tr.registerTransformer(selectedTransformer.uri.value, newName, selectedTransformer.description.value).then(function() {
-									getTransformers();
-								});
-							});
-            });
-
-            deleteRequest.fail(function (xhr, textStatus, errorThrown) {
-                console.error(xhr, textStatus, errorThrown);
-            });
-        });
-        ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
-            console.error(xhr, textStatus, errorThrown);
-        });
-    }
+			deleteRequest.fail(function (xhr, textStatus, errorThrown) {
+				console.error(xhr, textStatus, errorThrown);
+			});
+		});
+		ajaxRequest.fail(function (xhr, textStatus, errorThrown) {
+			console.error(xhr, textStatus, errorThrown);
+		});
+	}
 }
 
 function registerTransformer() {
@@ -245,29 +294,28 @@ function registerTransformer() {
 }
 
 function getTransformerByContainer(str) {
-    for (var i = 0; i < transformers.length; i++) {
-        if (transformers[i].child.value === str) {
-            return transformers[i];
-        }
-    }
-    ;
-    return null;
+	for (var i = 0; i < transformers.length; i++) {
+		if (transformers[i].child.value === str) {
+			return transformers[i];
+		}
+	}
+	return null;
 }
 
 $("#transformerList").change(function () {
-    var val = $(this).find("option:selected").val();
-    selectedTransformer = getTransformerByContainer(val);
+	var val = $(this).find("option:selected").val();
+	selectedTransformer = getTransformerByContainer(val);
 });
 
 function showTrDetails() {
-    if (!isEmpty(selectedTransformer)) {			
-			$('#infoTrTitle').html(selectedTransformer.title.value);
-			$('#infoTrDescription').html(selectedTransformer.description.value);
-			$('#infoTrResURI').html(selectedTransformer.child.value);
-			$('#infoTrURI').html(selectedTransformer.uri.value);
-			
-			$('#transformerInfo').modal();
-		}
+	if (!isEmpty(selectedTransformer)) {			
+		$('#infoTrTitle').html(selectedTransformer.title.value);
+		$('#infoTrDescription').html(selectedTransformer.description.value);
+		$('#infoTrResURI').html(selectedTransformer.child.value);
+		$('#infoTrURI').html(selectedTransformer.uri.value);
+		
+		$('#transformerInfo').modal();
+	}
 }
 
 /*********************/
@@ -275,65 +323,64 @@ function showTrDetails() {
 /*********************/
 
 function getFactories() {
-    var query = 'SELECT * WHERE { '
-            + '<' + config.tfrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
-            + '?child <http://purl.org/dc/terms/title> ?title . '
-            + '?child <http://vocab.fusepool.info/tfrldpc#transformerFactory> ?uri . '
-            + 'OPTIONAL { '
-            + '	?child <http://purl.org/dc/terms/description> ?description . '
-            + '}'
-            + 'OPTIONAL { '
-            + '	?child <http://purl.org/dc/terms/created> ?date . '
-            + '}'
-            + '}';
+	var query = 'SELECT * WHERE { '
+					+ '<' + config.tfrldpc + '> <http://www.w3.org/ns/ldp#contains> ?child . '
+					+ '?child <http://purl.org/dc/terms/title> ?title . '
+					+ '?child <http://vocab.fusepool.info/tfrldpc#transformerFactory> ?uri . '
+					+ 'OPTIONAL { '
+					+ '	?child <http://purl.org/dc/terms/description> ?description . '
+					+ '}'
+					+ 'OPTIONAL { '
+					+ '	?child <http://purl.org/dc/terms/created> ?date . '
+					+ '}'
+					+ '}';
 
-    $.ajax({
-        type: 'POST',
-        url: config.sparqlEndpoint,
-        headers: {
-            'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: { query: query }
-    }).done(function (data) {
-        $("#factoryList").empty();
-        factories = data.results.bindings;
-        var first = true;
+	$.ajax({
+		type: 'POST',
+		url: config.sparqlEndpoint,
+		headers: {
+			'Accept': 'application/sparql-results+json',
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
+		data: { query: query }
+	}).done(function (data) {
+		$("#factoryList").empty();
+		factories = data.results.bindings;
+		var first = true;
 
-        if (factories.length > 0) {
-            jQuery.each(factories, function (i, factory) {
-                if (first) {
-                    first = false;
-                    selectedFactory = factory;
-                    $("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value).prop('selected', 'selected'));
-                }
-                else {
-                    $("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value));
-                }
-            });
-        }
-        $("#factoryCount").text(factories.length);
+		if (factories.length > 0) {
+			jQuery.each(factories, function (i, factory) {
+				if (first) {
+					first = false;
+					selectedFactory = factory;
+					$("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value).prop('selected', 'selected'));
+				}
+				else {
+					$("#factoryList").append($('<option>').text(factory.title.value).prop("title", factory.child.value).val(factory.child.value));
+				}
+			});
+		}
+		$("#factoryCount").text(factories.length);
 
-    }).fail(function (xhr, textStatus, errorThrown) {
-        console.error(xhr, textStatus, errorThrown);
-    });
+	}).fail(function (xhr, textStatus, errorThrown) {
+		console.error(xhr, textStatus, errorThrown);
+	});
 }
 
 function openFactoryGui() {
-    openInNewTab(selectedFactory.uri.value + "&platformURI=" + platformURI);
+	openInNewTab(selectedFactory.uri.value + "&platformURI=" + platformURI);
 }
 
 function getFactoryByContainer(str) {
-    for (var i = 0; i < factories.length; i++) {
-        if (factories[i].child.value === str) {
-            return factories[i];
-        }
-    }
-    ;
-    return null;
+	for (var i = 0; i < factories.length; i++) {
+		if (factories[i].child.value === str) {
+			return factories[i];
+		}
+	}
+	return null;
 }
 
 $("#factoryList").change(function () {
-    var val = $(this).find("option:selected").val();
-    selectedFactory = getFactoryByContainer(val);
+	var val = $(this).find("option:selected").val();
+	selectedFactory = getFactoryByContainer(val);
 });
