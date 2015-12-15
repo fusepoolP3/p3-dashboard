@@ -187,16 +187,16 @@ function initTestPanel() {
   $('#testPanel').modal();
 	$('#testedTransformerName').text(selectedTransformer.title.value);
 	
-	$('#acceptHeaderSel').empty();
-  $('#acceptHeaderSel').append($('<option>').val('').text('Select from the list (optional)'));
-	for(var i=0; i<selectedTransformer.supportedInputFormats.length; i++) {
-    $('#acceptHeaderSel').append($('<option>').val(selectedTransformer.supportedInputFormats[i]).text(selectedTransformer.supportedInputFormats[i]));
-	}
-	
 	$('#contentTypeSel').empty();
   $('#contentTypeSel').append($('<option>').val('').text('Select from the list (optional)'));
+	for(var i=0; i<selectedTransformer.supportedInputFormats.length; i++) {
+    $('#contentTypeSel').append($('<option>').val(selectedTransformer.supportedInputFormats[i]).text(selectedTransformer.supportedInputFormats[i]));
+	}
+	
+	$('#acceptHeaderSel').empty();
+  $('#acceptHeaderSel').append($('<option>').val('').text('Select from the list (optional)'));
 	for(var i=0; i<selectedTransformer.supportedOutputFormats.length; i++) {
-    $('#contentTypeSel').append($('<option>').val(selectedTransformer.supportedOutputFormats[i]).text(selectedTransformer.supportedOutputFormats[i]));
+    $('#acceptHeaderSel').append($('<option>').val(selectedTransformer.supportedOutputFormats[i]).text(selectedTransformer.supportedOutputFormats[i]));
 	}
 	
 	$('#resultBox').html('');
